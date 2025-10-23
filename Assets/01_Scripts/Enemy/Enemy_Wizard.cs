@@ -55,11 +55,6 @@ public class Enemy_Wizard : EnemyBase
             xDir = -xDir;
             sr.flipX = xDir != 1;
         }
-
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            TakeDamage(10);
-        }
     }
 
     public override void TakeDamage(int dmg)
@@ -97,7 +92,6 @@ public class Enemy_Wizard : EnemyBase
 
         public override void Update()
         {
-            Debug.Log(owner.isAttack);
             anim.SetBool(owner.GetAnimationHash(AnimationMap.IsAttack), owner.isAttack);
             var side = target.position.x - transform.position.x;
             sr.flipX = side < 0;
