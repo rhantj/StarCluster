@@ -14,14 +14,12 @@ public class ExampleShipControl : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	
+
+
 		if (Input.GetKeyDown(KeyCode.Escape))
-			Screen.lockCursor = !Screen.lockCursor;	
-	
-	
-	
-		if (Input.GetKey(KeyCode.W)) {
+			Cursor.visible = !Cursor.visible;
+
+        if (Input.GetKey(KeyCode.W)) {
 			GetComponent<Rigidbody2D>().AddForce(transform.up * acceleration_amount * Time.deltaTime);
 		
 		}
