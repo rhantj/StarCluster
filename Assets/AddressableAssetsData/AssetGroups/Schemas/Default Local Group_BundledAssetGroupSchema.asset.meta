@@ -1,9 +1,8 @@
 fileFormatVersion: 2
-guid: bff57f800f9972247acebbff1fb7b0d2
-labels:
-- Planet
-DefaultImporter:
+guid: e726397ff03cd994e87e8c2c12505337
+NativeFormatImporter:
   externalObjects: {}
+  mainObjectFileID: 11400000
   userData: 
   assetBundleName: 
   assetBundleVariant: 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerSpaceShipContext : MonoBehaviour
 {
-    public DefaultInput InputActions { get; private set; }
+    public DefaultInput InputActions { get; set; }
     public Rigidbody2D Rb { get; private set; }
     public Vector2 Velocity
     {

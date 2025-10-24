@@ -21,6 +21,7 @@ public class PlayerContext : MonoBehaviour
         Rb = GetComponent<Rigidbody2D>();
         Col = GetComponent<Collider2D>();
         Renderer = GetComponent<SpriteRenderer>();
+        Anim = GetComponent<Animator>();
     }
 
     private void Start()

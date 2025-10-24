@@ -1,7 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
+using UnityEngine.SceneManagement;
 
 public class PlayerSpaceShipControl : MonoBehaviour
 {
@@ -11,14 +16,24 @@ public class PlayerSpaceShipControl : MonoBehaviour
     float moveSpeed = 5f;
     public Vector2 moveInput;
 
-    public Vector2 MoveSpector;
+    [Header("Scene load")]
+    bool isLoading;
+    bool canEntry = false;
+    AssetReference planet;
 
     private void Awake()
     {
         context = GetComponent<PlayerSpaceShipContext>();
 
+        context.InputActions = new DefaultInput();
         context.InputActions.Player.Move.performed += ReadMoveInput;
         context.InputActions.Player.Move.canceled += e => moveInput = Vector2.zero;
+        context.InputActions.Player.Interaction.started += Interaction_started;
+    }
+
+    private void OnEnable()
+    {
+        context.InputActions.Enable();
     }
 
     private void Update()
@@ -29,6 +44,38 @@ public class PlayerSpaceShipControl : MonoBehaviour
     private void FixedUpdate()
     {
         CalculateMovement();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        int planetMask = 1 << 7;
+        int layer = 1 << collision.gameObject.layer;
+
+
+        if (collision.gameObject.TryGetComponent<PlanetEntry>(out var p))
+        {
+            planet = p.planetScene;
+        }
+
+        if ((planetMask & layer) != 0)
+        {
+            Debug.Log("Enty [Space]");
+            canEntry = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        int planetMask = 1 << 7;
+        int layer = 1 << collision.gameObject.layer;
+
+        planet = null;
+
+        if ((planetMask & layer) != 0)
+        {
+            Debug.Log("Enty [Space]");
+            canEntry = false;
+        }
     }
 
     void CalculateMovement()
@@ -47,9 +94,6 @@ public class PlayerSpaceShipControl : MonoBehaviour
                 moveSpeed * moveInput.x + x, 
                 moveSpeed * moveInput.y + y
             );
-
-        
-        MoveSpector = context.Velocity;
     }
 
     void CalculateRotate()
@@ -67,8 +111,33 @@ public class PlayerSpaceShipControl : MonoBehaviour
         moveInput = obj.ReadValue<Vector2>();
     }
 
-    private void OnEnable()
+    private void Interaction_started(InputAction.CallbackContext obj)
     {
-        context.InputActions.Enable();
+        if (!canEntry || isLoading) return;
+        LoadPlanetScene();
+    }
+
+    void LoadPlanetScene()
+    {
+        isLoading = true;
+
+        var load = 
+            Addressables.LoadSceneAsync(planet, LoadSceneMode.Single, activateOnLoad: false);
+
+        load.Completed += OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(AsyncOperationHandle<SceneInstance> scene)
+    {
+        if (scene.Status == AsyncOperationStatus.Succeeded)
+        {
+            var activate = scene.Result.ActivateAsync();
+            activate.completed += e => isLoading = false;
+        }
+        else
+        {
+            Debug.LogError("Scene load fail");
+            isLoading = false;
+        }
     }
 }
