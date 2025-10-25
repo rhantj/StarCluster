@@ -14,27 +14,40 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] Transform groundPivot;
-    float jumpPower = 5f;
+    float jumpPower = 10f;
     int groundMask = 1 << 6;
     bool jumpPressed = false;
     float distance = 0.1f;
     Vector2 boxSize = new Vector2(.7f, 0.1f);
     float angle = 0f;
 
+    [Header("Interaction")]
+    bool canEntry = false;
+
+    [Header("Scene")]
+    SceneManagement scene;
+
     private void Awake()
     {
         plc = GetComponent<PlayerContext>();
-        jumpPower *= 1.5f;
+        scene = GetComponent<SceneManagement>();
+        //jumpPower *= 1.5f;
 
         plc.InputActions = new DefaultInput();
         plc.InputActions.Player.Move.performed += MoveInput;
         plc.InputActions.Player.Move.canceled += e => moveInput = Vector2.zero;
         plc.InputActions.Player.Jump.started += JumpPressed;
+        plc.InputActions.Player.Interaction.started += Interaction_started;
     }
 
     private void OnEnable()
     {
         plc.InputActions.Enable();
+    }
+
+    private void OnDestroy()
+    {
+        plc.InputActions.Disable();
     }
 
     private void Update()
@@ -47,14 +60,41 @@ public class PlayerController : MonoBehaviour
         CalculateMovement();
     }
 
-    void CalculateMovement()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        plc.Velocity = new Vector2(moveInput.x * moveSpeed, plc.Velocity.y);
+        var tag = collision.tag;
+        ChangeEntry(tag);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        var tag = collision.tag;
+        ChangeEntry(tag);
+    }
+
+    void ChangeEntry(string tag)
+    {
+        if (tag.Equals("ReturnPoint"))
+        {
+            canEntry = !canEntry;
+        }
     }
 
     private void MoveInput(InputAction.CallbackContext obj)
     {
         moveInput = obj.ReadValue<Vector2>();
+    }
+
+
+    private void Interaction_started(InputAction.CallbackContext obj)
+    {
+        if (!canEntry || scene.isLoading || !obj.started) return;
+        scene.LoadScene();
+    }
+
+    void CalculateMovement()
+    {
+        plc.Velocity = new Vector2(moveInput.x * moveSpeed, plc.Velocity.y);
     }
 
     void UpdateFacing()

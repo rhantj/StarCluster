@@ -20,8 +20,17 @@ MonoBehaviour:
   - m_GUID: bff57f800f9972247acebbff1fb7b0d2
     m_Address: Assets/01_Scenes/Planet.unity
     m_ReadOnly: 0
-    m_SerializedLabels:
-    - Planet
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ead5f49ab859fe14f8eb60dad62ae6a1
+    m_Address: Assets/01_Scenes/Space Scene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2cda990e2423bbf4892e6590ba056729
+    m_Address: Assets/01_Scenes/Title Scene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 666b3a2f83c93f94187698b4c86bcf24, type: 2}

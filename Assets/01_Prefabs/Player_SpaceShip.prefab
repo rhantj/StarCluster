@@ -300,6 +300,7 @@ GameObject:
   - component: {fileID: 7905669444390822377}
   - component: {fileID: 553495755464464908}
   - component: {fileID: 6370644096614985088}
+  - component: {fileID: 5319011017806019964}
   m_Layer: 0
   m_Name: Player_SpaceShip
   m_TagString: Untagged
@@ -349,7 +350,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveInput: {x: 0, y: 0}
-  MoveSpector: {x: 0, y: 0}
 --- !u!60 &553495755464464908
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -425,6 +425,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &5319011017806019964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7207535070354687183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eec5c76edd93af545a8e66064e3cc1fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7900495703715043840
 GameObject:
   m_ObjectHideFlags: 0

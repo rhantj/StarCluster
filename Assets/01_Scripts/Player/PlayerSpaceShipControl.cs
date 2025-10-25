@@ -1,12 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.SceneManagement;
 
 public class PlayerSpaceShipControl : MonoBehaviour
 {
@@ -17,13 +12,13 @@ public class PlayerSpaceShipControl : MonoBehaviour
     public Vector2 moveInput;
 
     [Header("Scene load")]
-    bool isLoading;
     bool canEntry = false;
-    AssetReference planet;
+    SceneManagement scene;
 
     private void Awake()
     {
         context = GetComponent<PlayerSpaceShipContext>();
+        scene = GetComponent<SceneManagement>();
 
         context.InputActions = new DefaultInput();
         context.InputActions.Player.Move.performed += ReadMoveInput;
@@ -51,15 +46,8 @@ public class PlayerSpaceShipControl : MonoBehaviour
         int planetMask = 1 << 7;
         int layer = 1 << collision.gameObject.layer;
 
-
-        if (collision.gameObject.TryGetComponent<PlanetEntry>(out var p))
-        {
-            planet = p.planetScene;
-        }
-
         if ((planetMask & layer) != 0)
         {
-            Debug.Log("Enty [Space]");
             canEntry = true;
         }
     }
@@ -69,11 +57,8 @@ public class PlayerSpaceShipControl : MonoBehaviour
         int planetMask = 1 << 7;
         int layer = 1 << collision.gameObject.layer;
 
-        planet = null;
-
         if ((planetMask & layer) != 0)
         {
-            Debug.Log("Enty [Space]");
             canEntry = false;
         }
     }
@@ -113,31 +98,7 @@ public class PlayerSpaceShipControl : MonoBehaviour
 
     private void Interaction_started(InputAction.CallbackContext obj)
     {
-        if (!canEntry || isLoading) return;
-        LoadPlanetScene();
-    }
-
-    void LoadPlanetScene()
-    {
-        isLoading = true;
-
-        var load = 
-            Addressables.LoadSceneAsync(planet, LoadSceneMode.Single, activateOnLoad: false);
-
-        load.Completed += OnSceneLoaded;
-    }
-
-    void OnSceneLoaded(AsyncOperationHandle<SceneInstance> scene)
-    {
-        if (scene.Status == AsyncOperationStatus.Succeeded)
-        {
-            var activate = scene.Result.ActivateAsync();
-            activate.completed += e => isLoading = false;
-        }
-        else
-        {
-            Debug.LogError("Scene load fail");
-            isLoading = false;
-        }
+        if (!canEntry || scene.isLoading) return;
+        scene.LoadScene();
     }
 }

@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 
 public class CameraFollowing : MonoBehaviour
 {
+    public static CameraFollowing Instance { get; private set; }
+
     [Header("Space")]
     [SerializeField] Transform space;
     SpriteRenderer spaceSR;
@@ -17,15 +18,31 @@ public class CameraFollowing : MonoBehaviour
 
     private void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        spaceSR = space.GetComponent<SpriteRenderer>();
+        if(Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else Destroy(gameObject);
 
-        DontDestroyOnLoad(gameObject);
+        player = GameObject.FindGameObjectWithTag("Player");
+        if ((int)player.transform.localScale.x == 1) Camera.main.orthographicSize = 5;
+        else Camera.main.orthographicSize = 10;
+
+        if (space == null)
+        {
+            space = GameObject.Find("Space").transform;
+        }
+        spaceSR = space.GetComponent<SpriteRenderer>();
 
         camXSize = Camera.main.orthographicSize * Camera.main.aspect;
         camYSize = Camera.main.orthographicSize;
     }
 
+    private void Start()
+    {
+
+    }
 
     private void LateUpdate()
     {
