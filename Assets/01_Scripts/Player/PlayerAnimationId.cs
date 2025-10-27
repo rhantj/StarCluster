@@ -6,6 +6,7 @@ public enum AnimationMap
 {
     MoveX,
     MoveY,
+    IsFire
 }
 
 public class PlayerAnimationId : MonoBehaviour

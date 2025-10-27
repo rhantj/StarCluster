@@ -27,6 +27,13 @@ public class PlayerController : MonoBehaviour
     [Header("Scene")]
     SceneManagement scene;
 
+    [Header("Fire")]
+    [SerializeField] GameObject bullet;
+    public bool isFire { get; set; } = false;
+
+    [Header("Get damage")]
+    int getDmg = 0;
+
     private void Awake()
     {
         plc = GetComponent<PlayerContext>();
@@ -38,6 +45,7 @@ public class PlayerController : MonoBehaviour
         plc.InputActions.Player.Move.canceled += e => moveInput = Vector2.zero;
         plc.InputActions.Player.Jump.started += JumpPressed;
         plc.InputActions.Player.Interaction.started += Interaction_started;
+        plc.InputActions.Player.Fire.started += Fire_started;
     }
 
     private void OnEnable()
@@ -85,11 +93,31 @@ public class PlayerController : MonoBehaviour
         moveInput = obj.ReadValue<Vector2>();
     }
 
-
     private void Interaction_started(InputAction.CallbackContext obj)
     {
         if (!canEntry || scene.isLoading || !obj.started) return;
         scene.LoadScene();
+    }
+    private void Fire_started(InputAction.CallbackContext obj)
+    {
+        isFire = true;
+    }
+
+    public void TakeDamage()
+    {
+        if (getDmg >= 3)
+        {
+            plc.Velocity = Vector2.zero;
+            ObjectPoolManager.Instance.ReturnToPool("Player", gameObject);
+        }
+        getDmg++;
+    }
+
+    public void PlayerInit()
+    {
+        getDmg = 0;
+        plc.Velocity = Vector2.zero;
+
     }
 
     void CalculateMovement()
@@ -120,5 +148,15 @@ public class PlayerController : MonoBehaviour
     {
         var hit = Physics2D.BoxCast(groundPivot.position, boxSize, angle, Vector2.down, distance, groundMask);
         return hit.collider != null;
+    }
+
+    public void EndFire()
+    {
+        isFire = false;
+    }
+
+    public void StartFire()
+    {
+        Debug.Log("Bullte Fired");
     }
 }

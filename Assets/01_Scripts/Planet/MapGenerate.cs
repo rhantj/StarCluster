@@ -118,7 +118,14 @@ public class MapGenerate : MonoBehaviour
                 //enemy
                 if (rand.NextDouble() < enemyChance && planetState == PlanetStateMap.Combat)
                 {
-                    ObjectPoolManager.Instance.SpawnFromPool("Enemy_Wizard", lastGroundTilePos + Vector3.up * 3f);
+                    if(ObjectPoolManager.Instance.SpawnFromPool("Enemy_Wizard", lastGroundTilePos + Vector3.up * 3f, out var e))
+                    {
+                        float a = Mathf.Max(8, lastGroundTilePos.x);
+                        float b = lastGroundTilePos.y;
+
+                        var spawnPos = new Vector3(a, b + 3f, 0);
+                        e.GetComponent<Enemy_Wizard>().SetStartPosition(spawnPos);
+                    }
                 }
             }
 
@@ -126,6 +133,7 @@ public class MapGenerate : MonoBehaviour
             if (platformTile && rand.NextDouble() < platformChance)
             {
                 int px = i + rand.Next(0, runLen);
+                px = Mathf.Min(px, heights.Length);
                 if (px < 0) px = 0;
 
                 int py = heights[px] + rand.Next(platformYOffsetRange.x, platformYOffsetRange.y);

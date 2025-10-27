@@ -42,7 +42,7 @@ public class GameManager : MonoBehaviour
                 ObjectPoolManager.Instance.ReturnToPool("Player", player);
             }
 
-            ObjectPoolManager.Instance.TrySpawnFromPool("Player_SpaceShip", Vector3.zero, out var pss);
+            ObjectPoolManager.Instance.SpawnFromPool("Player_SpaceShip", Vector3.zero, out var pss);
             playerShip = pss;
 
         }
@@ -53,7 +53,8 @@ public class GameManager : MonoBehaviour
                 ObjectPoolManager.Instance.ReturnToPool("Player_SpaceShip", playerShip);
             }
 
-            ObjectPoolManager.Instance.TrySpawnFromPool("Player", new Vector3(2.16f, 2.3f, 0), out var p);
+            ObjectPoolManager.Instance.SpawnFromPool("Player", new Vector3(2.16f, 2.3f, 0), out var p);
+            p.GetComponent<PlayerController>().PlayerInit();
             player = p;
         }
     }

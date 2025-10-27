@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,6 +21,7 @@ public class Enemy_Wizard : EnemyBase
 
     public Vector2 startPos;
     public Transform target;
+    [SerializeField] GameObject projectile;
     int xDir = 1;
 
     protected override void Awake()
@@ -49,7 +51,7 @@ public class Enemy_Wizard : EnemyBase
 
     private void OnSceneChanged(Scene arg0, Scene arg1)
     {
-        if (!arg1.name.Equals("Planet")) return;
+        if (!arg1.name.Equals("Planet") || !gameObject.activeSelf) return;
         StartCoroutine(SetReference());
     }
 
@@ -71,6 +73,11 @@ public class Enemy_Wizard : EnemyBase
         }
     }
 
+    public void SetStartPosition(Vector3 pos)
+    {
+        startPos = pos;
+    }
+
     public override void TakeDamage(int dmg)
     {
         base.TakeDamage(dmg);
@@ -78,6 +85,21 @@ public class Enemy_Wizard : EnemyBase
         {
             hp = 0;
             stateMachine.ChangeState(State.Die);
+        }
+    }
+
+    public void StartAttack()
+    {
+        Debug.Log("enemy Attack");
+        var pos = transform.position + new Vector3(0.9f * xDir, 0.33f, 0);
+        ObjectPoolManager.Instance.SpawnFromPool("EnemyWizardProjectile", pos, out var obj);
+
+        if(obj.TryGetComponent<WizardProjectile>(out var wp))
+        {
+            float x = target.position.x - transform.position.x;
+            x = Mathf.Clamp01(x);
+            if (x == 0) x--;
+            wp.Fire(Vector2.right * x, 8f, xDir == -1);
         }
     }
 
@@ -142,6 +164,7 @@ public class Enemy_Wizard : EnemyBase
     private class ReturnState : WizardState
     {
         public ReturnState(Enemy_Wizard owner) : base(owner) { }
+        float time = 0f;
 
         public override void Enter()
         {
@@ -154,6 +177,7 @@ public class Enemy_Wizard : EnemyBase
 
         public override void FixedUpdate()
         {
+            time += Time.deltaTime;
             var dir = startPos - (Vector2)transform.position;
             dir = dir.normalized;
 
@@ -162,9 +186,10 @@ public class Enemy_Wizard : EnemyBase
 
         public override void Transition()
         {
-            if (Vector2.Distance(startPos, transform.position) <= 1f)
+            if (Vector2.Distance(startPos, transform.position) <= 1f || time >=1f)
             {
                 rb.velocity = Vector2.zero;
+                time = 0f;
                 ChangeState(State.Patrol);
             }
         }

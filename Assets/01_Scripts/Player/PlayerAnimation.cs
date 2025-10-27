@@ -24,5 +24,6 @@ public class PlayerAnimation : MonoBehaviour
     {
         plc.Anim.SetFloat(animId.GetAnimationHash(AnimationMap.MoveX), Mathf.Abs(plc.Velocity.x));
         plc.Anim.SetFloat(animId.GetAnimationHash(AnimationMap.MoveY), Mathf.Abs(plc.Velocity.y));
+        plc.Anim.SetBool(animId.GetAnimationHash(AnimationMap.IsFire), player.isFire);
     }
 }

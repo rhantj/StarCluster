@@ -52,6 +52,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 682ce117ac8993b46bd637bb5b413b18
+    m_Address: Assets/01_Prefabs/Enemies/EnemyWizardProjectile.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 666b3a2f83c93f94187698b4c86bcf24, type: 2}
   m_SchemaSet:

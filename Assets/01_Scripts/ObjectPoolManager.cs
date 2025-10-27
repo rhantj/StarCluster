@@ -53,29 +53,29 @@ public class ObjectPoolManager : MonoBehaviour
         }
     }
 
-    public bool TrySpawnFromPool(string name, Vector3 position, out GameObject obj)
+    //public bool TrySpawnFromPool(string name, Vector3 position, out GameObject obj)
+    //{
+    //    obj = null;
+    //    if (!poolDictionary.TryGetValue(name, out var q))
+    //    {
+    //        Debug.LogError("Can't find object pool");
+    //        return false;
+    //    }
+
+    //    if (q.Count > 0)
+    //    {
+    //        obj = q.Dequeue();
+    //        obj.transform.position = position;
+    //        obj.SetActive(true);
+    //        return true;
+    //    }
+
+    //    return false;
+    //}
+
+    public GameObject SpawnFromPool(string name, Vector3 position, out GameObject obj)
     {
         obj = null;
-        if (!poolDictionary.TryGetValue(name, out var q))
-        {
-            Debug.LogError("Can't find object pool");
-            return false;
-        }
-
-        if (q.Count > 0)
-        {
-            obj = q.Dequeue();
-            obj.transform.position = position;
-            obj.SetActive(true);
-            return true;
-        }
-
-        return false;
-    }
-
-    public GameObject SpawnFromPool(string name, Vector3 position)
-    {
-        GameObject obj = null;
         if (!poolDictionary.TryGetValue(name, out var q))
         {
             Debug.LogError($"Key : {name} is not created in pool");
@@ -91,6 +91,7 @@ public class ObjectPoolManager : MonoBehaviour
             if (poolDataDic.TryGetValue(name, out var poolData))
             {
                 var handle = Addressables.InstantiateAsync(poolData.prefab, poolParent);
+                handle.Result.name = poolData.name;
                 obj = handle.Result;
             }
         }
