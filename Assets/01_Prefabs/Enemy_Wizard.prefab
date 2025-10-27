@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4601850183317006334}
   - component: {fileID: 6644205424491141023}
   m_Layer: 0
-  m_Name: Enemy Wizard
+  m_Name: Enemy_Wizard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

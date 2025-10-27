@@ -11,6 +11,4 @@ public class PlanetEntry : MonoBehaviour
 {
     public AssetReference planetScene;
     public PlanetStateMap pState;
-
-
 }

@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraFollowing : MonoBehaviour
 {
@@ -16,6 +18,8 @@ public class CameraFollowing : MonoBehaviour
     float camOffset = -10f;
     Vector3 targetPos;
 
+    bool isUpdatingRef;
+
     private void Awake()
     {
         if(Instance == null)
@@ -24,29 +28,90 @@ public class CameraFollowing : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
         else Destroy(gameObject);
-
-        player = GameObject.FindGameObjectWithTag("Player");
-        if ((int)player.transform.localScale.x == 1) Camera.main.orthographicSize = 5;
-        else Camera.main.orthographicSize = 10;
-
-        if (space == null)
-        {
-            space = GameObject.Find("Space").transform;
-        }
-        spaceSR = space.GetComponent<SpriteRenderer>();
-
-        camXSize = Camera.main.orthographicSize * Camera.main.aspect;
-        camYSize = Camera.main.orthographicSize;
     }
 
-    private void Start()
+    private void OnEnable()
     {
-
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
 
     private void LateUpdate()
     {
+        if(player == null || space == null)
+        {
+            SetReferences();
+            return;
+        }
+
         Following();
+    }
+
+    private void OnActiveSceneChanged(Scene arg0, Scene arg1)
+    {
+        StartCoroutine(Co_SetReferences());
+    }
+
+
+    private void OnSceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        StartCoroutine(Co_SetReferences());
+    }
+
+    IEnumerator Co_SetReferences()
+    {
+        yield return null;
+        SetReferences();
+
+        if(player == null || space == null)
+        {
+            if (!isUpdatingRef)
+            {
+                isUpdatingRef = true;
+
+                float elapsedTime = 0f;
+                while (elapsedTime < 0.5f && (player == null || space == null))
+                {
+                    SetReferences();
+                    elapsedTime += Time.fixedDeltaTime;
+                    yield return null;
+                }
+
+                isUpdatingRef = false;
+            }
+        }
+    }
+
+    void SetReferences()
+    {
+        var sceneName = SceneManager.GetActiveScene().name;
+
+        if (sceneName.Equals("Title Scene")) return;
+        if (player == null) 
+        {
+            player = GameObject.FindGameObjectWithTag("Player");
+            if ((int)player.transform.localScale.x == 1) Camera.main.orthographicSize = 5;
+            else Camera.main.orthographicSize = 10;
+        }
+
+        if (space == null)
+        {
+            space = GameObject.FindGameObjectWithTag("Space").transform;
+            spaceSR = space.GetComponent<SpriteRenderer>();
+        }
+
+        if (Camera.main != null)
+        {
+            camXSize = Camera.main.orthographicSize * Camera.main.aspect;
+            camYSize = Camera.main.orthographicSize;
+        }
+
     }
 
     void Following()

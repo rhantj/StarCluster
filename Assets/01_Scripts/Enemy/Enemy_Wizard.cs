@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.XR;
 
 public class Enemy_Wizard : EnemyBase
@@ -17,8 +18,8 @@ public class Enemy_Wizard : EnemyBase
         Die
     }
 
-    Vector2 startPos;
-    Transform target;
+    public Vector2 startPos;
+    public Transform target;
     int xDir = 1;
 
     protected override void Awake()
@@ -33,27 +34,40 @@ public class Enemy_Wizard : EnemyBase
         stateMachine.AddState(State.Die, new DieState(this));
 
         stateMachine.InitState(State.Patrol);
-    }
-
-    private void Start()
-    {
-        if(target == null)
-        {
-            target = GameObject.FindGameObjectWithTag("Player").transform;
-        }
-
         Initialize(data);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnEnable()
     {
-        int mask = 1 << 6;
-        int layer = 1 << collision.gameObject.layer;
+        SceneManager.activeSceneChanged += OnSceneChanged;
+    }
 
-        if ((mask & layer) != 0)
+    private void OnDisable()
+    {
+        StopCoroutine(SetReference());
+    }
+
+    private void OnSceneChanged(Scene arg0, Scene arg1)
+    {
+        if (!arg1.name.Equals("Planet")) return;
+        StartCoroutine(SetReference());
+    }
+
+    IEnumerator SetReference()
+    {
+        yield return null;
+
+        if (target == null)
         {
-            xDir = -xDir;
-            sr.flipX = xDir != 1;
+            var obj = GameObject.FindGameObjectWithTag("Player").transform;
+            if (obj != null)
+            {
+                target = obj;
+            }
+            else
+            {
+                target = null;
+            }
         }
     }
 
@@ -71,13 +85,25 @@ public class Enemy_Wizard : EnemyBase
     {
         public PatrolState(Enemy_Wizard owner) : base(owner) { }
 
+        float moveDistance = 0f;
+
         public override void FixedUpdate()
         {
+            if (target == null) return;
             rb.velocity = new Vector2(xDir * moveSpeed, rb.velocity.y);
+            moveDistance += moveSpeed * Time.fixedDeltaTime;
+
+            if(moveDistance >= 5f)
+            {
+                xDir = -xDir;
+                sr.flipX = xDir != 1;
+                moveDistance = 0f;
+            }
         }
 
         public override void Transition()
         {
+            if (target == null) return;
             if(Vector2.Distance(target.position, transform.position) <= findRange)
             {
                 rb.velocity = Vector2.zero;

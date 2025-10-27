@@ -32,6 +32,26 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: add5bf37dd0993040ae1257b2375a947
+    m_Address: Assets/01_Prefabs/Player_SpaceShip.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63c73a84c9b1b4c448a86b3dfb58cd1b
+    m_Address: Assets/01_Prefabs/Player.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bb13121585878ad41b4d4aadcc84297d
+    m_Address: Assets/01_Prefabs/Main Camera.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f0163a56c3005747a2bf74fa9146131
+    m_Address: Assets/01_Prefabs/Enemy Wizard.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 666b3a2f83c93f94187698b4c86bcf24, type: 2}
   m_SchemaSet:

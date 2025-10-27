@@ -219,7 +219,7 @@ GameObject:
   - component: {fileID: 288555953}
   m_Layer: 0
   m_Name: Space
-  m_TagString: Untagged
+  m_TagString: Space
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -308,6 +308,10 @@ PrefabInstance:
     - target: {fileID: 4035896639949337010, guid: 63c73a84c9b1b4c448a86b3dfb58cd1b, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4035896639949337010, guid: 63c73a84c9b1b4c448a86b3dfb58cd1b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5207431741533033323, guid: 63c73a84c9b1b4c448a86b3dfb58cd1b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -467,10 +471,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5a300488151a341849ea5920d5998b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  planetState: 0
   map: {fileID: 1855283383}
   groundTile: {fileID: 11400000, guid: 705478cd9da320047896e2831699e2a4, type: 2}
   wallTile: {fileID: 11400000, guid: 705478cd9da320047896e2831699e2a4, type: 2}
   platformTile: {fileID: 11400000, guid: 34d1095c4f4be8b4f9b3e1266da97449, type: 2}
+  enemy: {fileID: 1363882697578564626, guid: 9f0163a56c3005747a2bf74fa9146131, type: 3}
   returnPoint: {fileID: 2954278443769836025, guid: a57bfbcc7cc26f144ae0b82966c4887e, type: 3}
   mapSize: {x: 40, y: 40}
 --- !u!4 &803211105
