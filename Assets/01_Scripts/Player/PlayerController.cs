@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Fire")]
     [SerializeField] GameObject bullet;
+    [SerializeField] Transform firePoint;
     public bool isFire { get; set; } = false;
 
     [Header("Get damage")]
@@ -158,5 +159,8 @@ public class PlayerController : MonoBehaviour
     public void StartFire()
     {
         Debug.Log("Bullte Fired");
+        ObjectPoolManager.Instance.SpawnFromPool("PlayerProjectile", firePoint.position, out var p);
+
+        p.GetComponent<PlayerProjectile>().Fire(Vector3.up * plc.Facing, 11f, plc.Facing != 1);
     }
 }
