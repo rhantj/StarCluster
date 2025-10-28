@@ -56,11 +56,6 @@ public class EnemyBase : MonoBehaviour
 
     public int GetAnimationHash(AnimationMap anim) => hashMap[anim];
 
-    public void EndDie()
-    {
-        transform.gameObject.SetActive(false);
-    }
-
     public void EndAttack()
     {
         isAttack = false;

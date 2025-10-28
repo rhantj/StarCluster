@@ -2144,6 +2144,8 @@ MonoBehaviour:
     m_SubObjectType: 
     m_EditorAssetChanged: 0
   pState: 0
+  itemDatas:
+  - {fileID: 11400000, guid: 0187aa961c7fde64f8ee48cacd301c49, type: 2}
 --- !u!212 &1617469528
 SpriteRenderer:
   m_ObjectHideFlags: 0

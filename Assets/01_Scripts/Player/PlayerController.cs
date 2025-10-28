@@ -24,9 +24,6 @@ public class PlayerController : MonoBehaviour
     [Header("Interaction")]
     bool canEntry = false;
 
-    [Header("Scene")]
-    SceneManagement scene;
-
     [Header("Fire")]
     [SerializeField] GameObject bullet;
     [SerializeField] Transform firePoint;
@@ -38,7 +35,6 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         plc = GetComponent<PlayerContext>();
-        scene = GetComponent<SceneManagement>();
         //jumpPower *= 1.5f;
 
         plc.InputActions = new DefaultInput();
@@ -94,11 +90,26 @@ public class PlayerController : MonoBehaviour
         moveInput = obj.ReadValue<Vector2>();
     }
 
+    private void JumpPressed(InputAction.CallbackContext obj)
+    {
+        jumpPressed = true;
+        if (jumpPressed && IsGrounded())
+        {
+            plc.Rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            jumpPressed = false;
+        }
+    }
+
     private void Interaction_started(InputAction.CallbackContext obj)
     {
-        if (!canEntry || scene.isLoading || !obj.started) return;
-        scene.LoadScene();
+        if (!canEntry || !obj.started) return;
+
+        var clearCanv = GameObject.FindGameObjectWithTag("Canvas");
+        var panel = clearCanv.GetComponent<ClearControl>();
+
+        panel.Toggle();
     }
+
     private void Fire_started(InputAction.CallbackContext obj)
     {
         isFire = true;
@@ -106,7 +117,7 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage()
     {
-        if (getDmg >= 3)
+        if (getDmg >= 99)
         {
             plc.Velocity = Vector2.zero;
             ObjectPoolManager.Instance.ReturnToPool("Player", gameObject);
@@ -135,16 +146,6 @@ public class PlayerController : MonoBehaviour
         plc.Renderer.flipX = plc.Facing != 1;
     }
 
-    private void JumpPressed(InputAction.CallbackContext obj)
-    {
-        jumpPressed = true;
-        if (jumpPressed && IsGrounded())
-        {
-            plc.Rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            jumpPressed = false;
-        }
-    }
-
     public bool IsGrounded()
     {
         var hit = Physics2D.BoxCast(groundPivot.position, boxSize, angle, Vector2.down, distance, groundMask);
@@ -158,7 +159,6 @@ public class PlayerController : MonoBehaviour
 
     public void StartFire()
     {
-        Debug.Log("Bullte Fired");
         ObjectPoolManager.Instance.SpawnFromPool("PlayerProjectile", firePoint.position, out var p);
 
         p.GetComponent<PlayerProjectile>().Fire(Vector3.up * plc.Facing, 11f, plc.Facing != 1);

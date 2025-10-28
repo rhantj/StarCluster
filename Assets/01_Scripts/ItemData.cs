@@ -7,6 +7,9 @@ using UnityEngine;
 public class ItemData : ScriptableObject
 {
     public string Name;
+    public string Description;
     public int Count;
     public Sprite Icon;
+
+    public bool canStack;
 }

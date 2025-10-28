@@ -105,4 +105,9 @@ public class StateMachine : MonoBehaviour
     {
         ChangeState(stateType.ToString());
     }
+
+    public string GetCurrentState()
+    {
+        return currentState.ToString();
+    }
 }

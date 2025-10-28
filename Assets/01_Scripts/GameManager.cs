@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Planet")]
     PlanetStateMap planetState;
+    List<ItemData> itemDatas = new();
 
     [Header("Players")]
     GameObject player;
@@ -67,5 +68,18 @@ public class GameManager : MonoBehaviour
     public PlanetStateMap GetPlanetState()
     {
         return planetState;
+    }
+
+    public void SetPlanetItemData(ItemData[] datas)
+    {
+        foreach (ItemData item in datas)
+        {
+            itemDatas.Add(item);
+        }
+    }
+
+    public List<ItemData> GetPlanetItemData()
+    {
+        return itemDatas;
     }
 }

@@ -33,6 +33,13 @@ public class WizardProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        int mask = 1 << 6;
+        int layer = collision.gameObject.layer;
+        if ((mask & layer) != 1)
+        {
+            ObjectPoolManager.Instance.ReturnToPool("EnemyWizardProjectile", gameObject);
+        }
+
         if (collision.TryGetComponent<PlayerController>(out var p))
         {
             p.TakeDamage();

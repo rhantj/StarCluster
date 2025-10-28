@@ -13,7 +13,7 @@ public class CameraFollowing : MonoBehaviour
     [SerializeField] Transform space;
     SpriteRenderer spaceSR;
 
-    GameObject player;
+    public GameObject player;
     float camXSize, camYSize;
     float camOffset = -10f;
     Vector3 targetPos;
@@ -93,12 +93,10 @@ public class CameraFollowing : MonoBehaviour
         var sceneName = SceneManager.GetActiveScene().name;
 
         if (sceneName.Equals("Title Scene")) return;
-        if (player == null) 
-        {
-            player = GameObject.FindGameObjectWithTag("Player");
-            if ((int)player.transform.localScale.x == 1) Camera.main.orthographicSize = 5;
-            else Camera.main.orthographicSize = 10;
-        }
+
+        player = GameObject.FindGameObjectWithTag("Player");
+        if (sceneName.Equals("Planet")) Camera.main.orthographicSize = 5;
+        else Camera.main.orthographicSize = 10;
 
         if (space == null)
         {

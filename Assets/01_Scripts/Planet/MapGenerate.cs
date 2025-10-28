@@ -21,6 +21,7 @@ public class MapGenerate : MonoBehaviour
 
     [Header("Map")]
     [SerializeField] Vector2Int mapSize = new Vector2Int(40, 40);
+    [SerializeField] ClearControl clearCanv;
 
 
     private void Awake()
@@ -32,11 +33,6 @@ public class MapGenerate : MonoBehaviour
     {
         SetGround();
         GenerateMap();
-
-        if (planetState == PlanetStateMap.Adventure)
-        {
-
-        }
     }
 
     void SetGround()
@@ -120,6 +116,7 @@ public class MapGenerate : MonoBehaviour
                 {
                     if(ObjectPoolManager.Instance.SpawnFromPool("Enemy_Wizard", lastGroundTilePos + Vector3.up * 3f, out var e))
                     {
+                        clearCanv.PlusEnemyCount(); // enemy += 1
                         float a = Mathf.Max(8, lastGroundTilePos.x);
                         float b = lastGroundTilePos.y;
 
@@ -133,7 +130,7 @@ public class MapGenerate : MonoBehaviour
             if (platformTile && rand.NextDouble() < platformChance)
             {
                 int px = i + rand.Next(0, runLen);
-                px = Mathf.Min(px, heights.Length);
+                px = Mathf.Min(px, heights.Length - 1);
                 if (px < 0) px = 0;
 
                 int py = heights[px] + rand.Next(platformYOffsetRange.x, platformYOffsetRange.y);

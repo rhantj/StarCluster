@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class PlayerSpaceShipControl : MonoBehaviour
 {
     PlayerSpaceShipContext context;
+    UpgradeControl upgradeControl;
 
     [Header("Movement")]
     float moveSpeed = 5f;
@@ -19,11 +20,13 @@ public class PlayerSpaceShipControl : MonoBehaviour
     {
         context = GetComponent<PlayerSpaceShipContext>();
         scene = GetComponent<SceneManagement>();
+        upgradeControl = GetComponentInChildren<UpgradeControl>();
 
         context.InputActions = new DefaultInput();
         context.InputActions.Player.Move.performed += ReadMoveInput;
         context.InputActions.Player.Move.canceled += e => moveInput = Vector2.zero;
         context.InputActions.Player.Interaction.started += Interaction_started;
+        context.InputActions.Player.Panel.started += ShowUpgradePanel;
     }
 
     private void OnEnable()
@@ -100,5 +103,10 @@ public class PlayerSpaceShipControl : MonoBehaviour
     {
         if (!canEntry || scene.isLoading) return;
         scene.LoadScene();
+    }
+
+    private void ShowUpgradePanel(InputAction.CallbackContext obj)
+    {
+        upgradeControl.Toggle();
     }
 }

@@ -31,6 +31,7 @@ public class ObjectPoolManager : MonoBehaviour
     private IEnumerator Start()
     {
         GameObject parentHolder = new("ObjectPoolParent");
+        parentHolder.transform.position = Vector2.up * 100;
         DontDestroyOnLoad(parentHolder.gameObject);
         poolParent = parentHolder.transform;
 
@@ -52,26 +53,6 @@ public class ObjectPoolManager : MonoBehaviour
             poolDataDic.Add(pool.name, pool);
         }
     }
-
-    //public bool TrySpawnFromPool(string name, Vector3 position, out GameObject obj)
-    //{
-    //    obj = null;
-    //    if (!poolDictionary.TryGetValue(name, out var q))
-    //    {
-    //        Debug.LogError("Can't find object pool");
-    //        return false;
-    //    }
-
-    //    if (q.Count > 0)
-    //    {
-    //        obj = q.Dequeue();
-    //        obj.transform.position = position;
-    //        obj.SetActive(true);
-    //        return true;
-    //    }
-
-    //    return false;
-    //}
 
     public GameObject SpawnFromPool(string name, Vector3 position, out GameObject obj)
     {

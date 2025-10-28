@@ -7,6 +7,7 @@ TagManager:
   - Projectile
   - ReturnPoint
   - Space
+  - Canvas
   layers:
   - Default
   - TransparentFX

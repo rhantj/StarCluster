@@ -19,6 +19,8 @@ public class Enemy_Wizard : EnemyBase
         Die
     }
 
+    State currentState;
+
     public Vector2 startPos;
     public Transform target;
     [SerializeField] GameObject projectile;
@@ -27,6 +29,7 @@ public class Enemy_Wizard : EnemyBase
     protected override void Awake()
     {
         base.Awake();
+        currentState = State.Patrol;
         startPos = transform.position;
         stateMachine = gameObject.AddComponent<StateMachine>();
 
@@ -41,6 +44,7 @@ public class Enemy_Wizard : EnemyBase
 
     private void OnEnable()
     {
+        rb.isKinematic = false;
         SceneManager.activeSceneChanged += OnSceneChanged;
     }
 
@@ -80,8 +84,9 @@ public class Enemy_Wizard : EnemyBase
 
     public override void TakeDamage(int dmg)
     {
+        if (currentState == State.Die) return;
         base.TakeDamage(dmg);
-        if(hp <= 0)
+        if (hp <= 0)
         {
             hp = 0;
             stateMachine.ChangeState(State.Die);
@@ -90,7 +95,6 @@ public class Enemy_Wizard : EnemyBase
 
     public void StartAttack()
     {
-        Debug.Log("enemy Attack");
         var pos = transform.position + new Vector3(0.9f * xDir, 0.33f, 0);
         ObjectPoolManager.Instance.SpawnFromPool("EnemyWizardProjectile", pos, out var obj);
 
@@ -103,11 +107,21 @@ public class Enemy_Wizard : EnemyBase
         }
     }
 
+    public void EndDie()
+    {
+        ObjectPoolManager.Instance.ReturnToPool("Enemy_Wizard", gameObject);
+    }
+
     private class PatrolState : WizardState
     {
         public PatrolState(Enemy_Wizard owner) : base(owner) { }
 
         float moveDistance = 0f;
+
+        public override void Enter()
+        {
+            owner.currentState = State.Patrol;
+        }
 
         public override void FixedUpdate()
         {
@@ -137,6 +151,12 @@ public class Enemy_Wizard : EnemyBase
     private class AttacState : WizardState
     {
         public AttacState(Enemy_Wizard owner) : base(owner) { }
+        public override void Enter()
+        {
+            owner.currentState = State.Attack;
+            rb.velocity = Vector2.zero;
+            owner.isAttack = true;
+        }
 
         public override void Update()
         {
@@ -145,11 +165,6 @@ public class Enemy_Wizard : EnemyBase
             sr.flipX = side < 0;
         }
 
-        public override void Enter()
-        {
-            rb.velocity = Vector2.zero;
-            owner.isAttack = true;
-        }
 
         public override void Transition()
         {
@@ -168,6 +183,8 @@ public class Enemy_Wizard : EnemyBase
 
         public override void Enter()
         {
+            owner.currentState = State.Return;
+
             anim.SetBool(owner.GetAnimationHash(AnimationMap.IsAttack), owner.isAttack);
 
             if (rb.velocity.x < 0) xDir = -1;
@@ -200,10 +217,14 @@ public class Enemy_Wizard : EnemyBase
         public DieState(Enemy_Wizard owner) : base(owner) { }
         public override void Enter()
         {
+            owner.currentState = State.Die;
+
+            var clearCtrl = GameObject.FindGameObjectWithTag("Canvas").GetComponent<ClearControl>();
+            clearCtrl.MinusEnemyCount();
             rb.velocity = Vector2.zero;
 
             anim.SetInteger(owner.GetAnimationHash(AnimationMap.Death), owner.hp);
-            col.isTrigger = true;
+            rb.isKinematic = true;
         }
     }
 
