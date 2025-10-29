@@ -60,10 +60,6 @@ public class MapGenerate : MonoBehaviour
         var platformChance = .2f;
         var enemyChance = 0.1f;
 
-        Vector2Int gapLenRange = new(2, 5);
-        Vector2Int platformLenRange = new(2, 4);
-        Vector2Int platformYOffsetRange = new(2, 5);
-
         for (int x = 0; x < mapWidth; ++x)
         {
             if (rand.NextDouble() < randomWalk)
@@ -84,7 +80,7 @@ public class MapGenerate : MonoBehaviour
             bool makeGap = rand.NextDouble() < gapChance;
             if (makeGap)
             {
-                int gap = rand.Next(gapLenRange.x, gapLenRange.y + 1);
+                int gap = rand.Next(2, 6);
                 if (gap < 2) gap = 2;
 
                 i += Mathf.Min(gap, mapWidth - i);
@@ -133,8 +129,8 @@ public class MapGenerate : MonoBehaviour
                 px = Mathf.Min(px, heights.Length - 1);
                 if (px < 0) px = 0;
 
-                int py = heights[px] + rand.Next(platformYOffsetRange.x, platformYOffsetRange.y);
-                int plen = rand.Next(platformLenRange.x, platformLenRange.y + 1);
+                int py = heights[px] + rand.Next(2, 5);
+                int plen = rand.Next(2, 5);
 
                 for (int p = 0; p < plen && px + p < mapWidth; ++p)
                     map.SetTile(new Vector3Int(px + p, py, 0), platformTile);

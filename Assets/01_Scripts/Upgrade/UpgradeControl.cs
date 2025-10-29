@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UpgradeControl : MonoBehaviour
 {
@@ -14,7 +15,88 @@ public class UpgradeControl : MonoBehaviour
     int selectedItemIdx;
     public TextMeshProUGUI selectedItemName;
     public TextMeshProUGUI selectedItemDescription;
-    public GameObject confirmButton;
+
+    [Header("Space ship")]
+    public Image spaceShipUpgradePanel;
+    public List<Sprite> spaceShipSprites;
+    public Transform upgradeRequirePos;
+    public Button confirmButton;
+    public GameObject itemSlot;
+    UpgradeMinerals minerals;
+    UpgradeData upgradeData;
+    int upgrades = 0;
+
+    void NextUpgrade()
+    {
+        foreach(Transform items in upgradeRequirePos)
+        {
+            if (items != null)
+                Destroy(items.gameObject);
+        }
+
+        spaceShipUpgradePanel.sprite = spaceShipSprites[upgrades];
+        var itemDatas = upgradeData.itemDatas;
+        var itemCounts = upgradeData.itemCounts;
+
+        for (int i = 0; i <= upgrades; ++i)
+        {
+            GameObject obj = Instantiate(itemSlot, upgradeRequirePos);
+            obj.name = itemDatas[i].name;
+            obj.GetComponent<Image>().sprite = itemDatas[i].Icon;
+            obj.GetComponent<ItemSlot>().countText.text = itemCounts[i].ToString();
+
+            obj.transform.SetParent(upgradeRequirePos, true);
+        }
+    }
+
+    void OnConfirmBtnClicked()
+    {
+        if (upgrades == spaceShipSprites.Count - 1) return;
+        RemoveItem();
+        upgrades++;
+        NextUpgrade();
+
+    }
+
+    void RemoveItem()
+    {
+        var itemDatas = upgradeData.itemDatas;
+        var itemCounts = upgradeData.itemCounts;
+
+        for (int i = 0; i <= upgrades; ++i)
+        {
+            //var slot = GetItemSlot(itemDatas[i]);
+            var slot = GetItemSlot(itemDatas[i]);
+            if (slot == null) continue;
+
+            var countMinus = slot.count - itemCounts[i];
+            if (countMinus < 0)
+            {
+                Debug.LogError("Mineral requirements are lacking");
+                return;
+            }
+        }
+
+        for (int i = 0; i <= upgrades; ++i)
+        {
+            var slot = GetItemSlot(itemDatas[i]);
+            slot.count -= itemCounts[i];
+        }
+        
+        UpdateUI();
+    }
+
+    private void Awake()
+    {
+        minerals = GetComponentInChildren<UpgradeMinerals>();
+        upgradeData = minerals.GetUpgradeData();
+    }
+
+    private void OnEnable()
+    {
+        confirmButton.onClick.RemoveAllListeners();
+        confirmButton.onClick.AddListener(OnConfirmBtnClicked);
+    }
 
     private void Start()
     {
@@ -29,6 +111,7 @@ public class UpgradeControl : MonoBehaviour
 
             ClearSelectedItemWindow();
         }
+        NextUpgrade();
     }
 
     void ClearSelectedItemWindow()
@@ -76,7 +159,7 @@ public class UpgradeControl : MonoBehaviour
         if (emptySlot != null)
         {
             emptySlot.item = data;
-            emptySlot.count = 1;
+            emptySlot.count = data.Count;
             
             UpdateUI();
             return;
@@ -109,7 +192,7 @@ public class UpgradeControl : MonoBehaviour
 
     public void UpdateUI()
     {
-        for(int i=0; i<slots.Length; ++i)
+        for (int i = 0; i < slots.Length; ++i)
         {
             if (slots[i].item != null)
             {

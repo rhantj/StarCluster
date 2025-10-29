@@ -19,6 +19,9 @@ public class GameManager : MonoBehaviour
     GameObject player;
     GameObject playerShip;
 
+    [Header("Upgrade Space Ship")]
+    UpgradeControl upgradeCtrl;
+
     private void Awake()
     {
         if(Instance == null)
@@ -27,6 +30,8 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
         else Destroy(gameObject);
+
+        upgradeCtrl = FindObjectOfType<UpgradeControl>();
     }
 
     private void OnEnable()
@@ -72,6 +77,7 @@ public class GameManager : MonoBehaviour
 
     public void SetPlanetItemData(ItemData[] datas)
     {
+        itemDatas.Clear();
         foreach (ItemData item in datas)
         {
             itemDatas.Add(item);
@@ -81,5 +87,10 @@ public class GameManager : MonoBehaviour
     public List<ItemData> GetPlanetItemData()
     {
         return itemDatas;
+    }
+
+    public UpgradeControl GetUpgradeCtrlUI()
+    {
+        return upgradeCtrl;
     }
 }

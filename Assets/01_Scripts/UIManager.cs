@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    [Header("Clear")]
-    [SerializeField] GameObject clearPanel;
-
     [Header("Buttons")]
     [SerializeField] Button startBtn;
     [SerializeField] Button exitBtn;

@@ -10,9 +10,9 @@ public class ClearControl : MonoBehaviour
     public Transform itemList;
     public int enemyCount;
     public GameObject itemSlot;
-    SceneManagement smt;
     public List<ItemData> itemDatas = new();
-
+    SceneManagement smt;
+    UpgradeControl upgradeCtrl;
 
     private void Awake()
     {
@@ -22,6 +22,7 @@ public class ClearControl : MonoBehaviour
 
     private void OnEnable()
     {
+        confirmBtn.onClick.RemoveAllListeners();
         confirmBtn.onClick.AddListener(OnButtonClicked);
     }
 
@@ -32,6 +33,7 @@ public class ClearControl : MonoBehaviour
 
     private void Start()
     {
+        upgradeCtrl = GameManager.Instance.GetUpgradeCtrlUI();
         itemDatas = GameManager.Instance.GetPlanetItemData();
     }
 
@@ -48,6 +50,12 @@ public class ClearControl : MonoBehaviour
 
     void UpdateUI()
     {
+        foreach (Transform items in itemList)
+        {
+            if (items != null)
+            Destroy(items.gameObject);
+        }
+
         for (int i = 0; i < itemDatas.Count; ++i)
         {
             GameObject obj = Instantiate(itemSlot, itemList);
@@ -73,6 +81,11 @@ public class ClearControl : MonoBehaviour
     {
         if (confirmBtn == null) return;
         if (smt.isLoading) return;
+
+        foreach(var data in itemDatas)
+        {
+            upgradeCtrl.AddItem(data);
+        }
 
         smt.LoadScene();
     }

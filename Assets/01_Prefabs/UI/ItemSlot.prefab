@@ -149,7 +149,7 @@ GameObject:
   - component: {fileID: 8039807540256704411}
   - component: {fileID: 2436261091578348630}
   m_Layer: 5
-  m_Name: Item Slot
+  m_Name: ItemSlot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -242,8 +242,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   item: {fileID: 0}
   inv: {fileID: 0}
-  button: {fileID: 0}
-  icon: {fileID: 0}
+  button: {fileID: 2436261091578348630}
+  icon: {fileID: 507831621029045520}
   countText: {fileID: 4078163422400956677}
   idx: 0
   count: 0

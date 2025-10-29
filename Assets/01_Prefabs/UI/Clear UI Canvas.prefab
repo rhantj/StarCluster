@@ -552,7 +552,8 @@ MonoBehaviour:
   confirmBtn: {fileID: 7593827314520174950}
   itemList: {fileID: 1259300075351921420}
   enemyCount: 0
-  itemSlot: {fileID: 4061203270877164858, guid: 1b32bc607b88bbc4eb7429e773da654e, type: 3}
+  itemSlot: {fileID: 4061203270877164858, guid: 2c73779bb1a29ef4ea91bcf27e251f3d, type: 3}
+  itemDatas: []
 --- !u!114 &2640641320844721543
 MonoBehaviour:
   m_ObjectHideFlags: 0

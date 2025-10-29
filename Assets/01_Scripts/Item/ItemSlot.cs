@@ -25,6 +25,10 @@ public class ItemSlot : MonoBehaviour
     private void OnEnable()
     {
         outline.enabled = false;
+
+        if (button == null) return;
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(OnClickButton);
     }
 
     public void Set()
@@ -32,7 +36,7 @@ public class ItemSlot : MonoBehaviour
         icon.gameObject.SetActive(true);
         icon.sprite = item.Icon;
 
-        countText.text = count > 1 ? count.ToString() : string.Empty;
+        countText.text = count >= 1 ? count.ToString() : string.Empty;
 
         if (outline != null)
         {

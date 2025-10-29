@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Iron_Data
   m_EditorClassIdentifier: 
   Name: Iron
-  Description: Spaceship upgrade material.
-  Count: 10
-  Icon: {fileID: 21300000, guid: 06ebc3b6f7d199745ac6895e9d0f2e09, type: 3}
+  Description: Spaceship upgrade material.(Iron)
+  Count: 20
+  Icon: {fileID: 21300000, guid: f3b1571d2cc45424ca08eda407a2020b, type: 3}
   canStack: 1
