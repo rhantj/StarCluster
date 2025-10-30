@@ -12,20 +12,12 @@ public class ItemSlot : MonoBehaviour
     public Button button;
     public Image icon;
     public TextMeshProUGUI countText;
-    Outline outline;
 
     public int idx;
     public int count;
 
-    private void Awake()
-    {
-        outline = GetComponent<Outline>();
-    }
-
     private void OnEnable()
     {
-        outline.enabled = false;
-
         if (button == null) return;
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OnClickButton);
@@ -33,15 +25,15 @@ public class ItemSlot : MonoBehaviour
 
     public void Set()
     {
+        if(icon == null)
+        {
+            Debug.LogError("Icon is null");
+            return;
+        }
+
         icon.gameObject.SetActive(true);
         icon.sprite = item.Icon;
-
         countText.text = count >= 1 ? count.ToString() : string.Empty;
-
-        if (outline != null)
-        {
-            outline.enabled = true;
-        }
     }
 
     public void Clear()

@@ -113,11 +113,17 @@ public class PlayerSpaceShipControl : MonoBehaviour
     private void Interaction_started(InputAction.CallbackContext obj)
     {
         if (!canEntry || scene.isLoading) return;
+        GameManager.Instance.SetSpaceShipPosition(transform.position);
         scene.LoadScene();
     }
 
     private void ShowUpgradePanel(InputAction.CallbackContext obj)
     {
         upgradeCtrl.Toggle();
+    }
+
+    public void SetMoveSpeed(float speed)
+    {
+        moveSpeed = speed;
     }
 }

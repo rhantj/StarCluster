@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     [Header("Players")]
     GameObject player;
     GameObject playerShip;
+    Vector3 playerShipPos = Vector3.zero;
 
     [Header("Upgrade Space Ship")]
     UpgradeControl upgradeCtrl;
@@ -49,6 +50,7 @@ public class GameManager : MonoBehaviour
             }
 
             ObjectPoolManager.Instance.SpawnFromPool("Player_SpaceShip", Vector3.zero, out var pss);
+            pss.transform.position = playerShipPos;
             playerShip = pss;
 
         }
@@ -92,5 +94,15 @@ public class GameManager : MonoBehaviour
     public UpgradeControl GetUpgradeCtrlUI()
     {
         return upgradeCtrl;
+    }
+
+    public GameObject GetSpaceShip()
+    {
+        return playerShip;
+    }
+
+    public void SetSpaceShipPosition(Vector3 pos)
+    {
+        playerShipPos = pos;
     }
 }

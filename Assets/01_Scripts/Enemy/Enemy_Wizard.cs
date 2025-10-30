@@ -77,6 +77,13 @@ public class Enemy_Wizard : EnemyBase
         }
     }
 
+    public void Initialize()
+    {
+        hp = 3;
+        currentState = State.Patrol;
+        stateMachine.ChangeState(State.Patrol);
+    }
+
     public void SetStartPosition(Vector3 pos)
     {
         startPos = pos;

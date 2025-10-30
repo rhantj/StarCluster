@@ -12,14 +12,14 @@ public class PlayerSpaceShipContext : MonoBehaviour
         set {  Rb.velocity = value; }
     }
     public Collider2D Col { get; private set; }
-    public SpriteRenderer[] Renderers { get; private set; }
+    public SpriteRenderer Renderer { get; private set; }
 
     private void Awake()
     {
         InputActions = new DefaultInput();
         Rb = GetComponent<Rigidbody2D>();
         Col = GetComponent<Collider2D>();
-        Renderers = GetComponentsInChildren<SpriteRenderer>();
+        Renderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Start()

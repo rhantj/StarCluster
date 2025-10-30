@@ -22,17 +22,22 @@ public class ObjectPoolManager : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
         }
     }
 
-    private IEnumerator Start()
+    private void OnEnable()
+    {
+        StartCoroutine(CreatePool());
+    }
+
+    IEnumerator CreatePool()
     {
         GameObject parentHolder = new("ObjectPoolParent");
         parentHolder.transform.position = Vector2.up * 100;
-        DontDestroyOnLoad(parentHolder.gameObject);
+        DontDestroyOnLoad(parentHolder);
         poolParent = parentHolder.transform;
 
         foreach (var pool in pools)
@@ -52,6 +57,10 @@ public class ObjectPoolManager : MonoBehaviour
             poolDictionary.Add(pool.name, objPool);
             poolDataDic.Add(pool.name, pool);
         }
+
+        var UI = GetComponent<UIManager>();
+
+        UI.SetButtonAction.Invoke();
     }
 
     public GameObject SpawnFromPool(string name, Vector3 position, out GameObject obj)

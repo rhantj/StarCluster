@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -60,8 +61,10 @@ public class ClearControl : MonoBehaviour
         {
             GameObject obj = Instantiate(itemSlot, itemList);
             obj.name = itemDatas[i].name;
-            obj.GetComponent<Image>().sprite = itemDatas[i].Icon;
-            obj.GetComponent<ItemSlot>().countText.text = itemDatas[i].Count.ToString();
+            var slot = obj.GetComponent<ItemSlot>();
+
+            slot.icon.sprite = itemDatas[i].Icon;
+            slot.countText.text = itemDatas[i].Count.ToString();
 
             obj.transform.SetParent(itemList, true);
         }

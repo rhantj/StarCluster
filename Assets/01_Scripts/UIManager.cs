@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,14 +11,27 @@ public class UIManager : MonoBehaviour
     [SerializeField] Button exitBtn;
 
     SceneManagement sma;
+    public Action SetButtonAction;
 
     private void Awake()
     {
         sma = GetComponent<SceneManagement>();
+        SetButtonAction += SetButtons;
     }
 
-    private void Start()
+    private void OnDisable()
     {
+        SetButtonAction -= SetButtons;
+    }
+
+    public void SetButtons()
+    {
+        startBtn.gameObject.SetActive(true);
+        exitBtn.gameObject.SetActive(true);
+
+        startBtn.onClick.RemoveAllListeners();
+        exitBtn.onClick.RemoveAllListeners();
+
         startBtn.onClick.AddListener(OnStartButtonClicked);
         exitBtn.onClick.AddListener(OnExitButtonClicked);
     }

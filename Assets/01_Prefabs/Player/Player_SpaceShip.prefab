@@ -537,7 +537,7 @@ GameObject:
   - component: {fileID: 5657252488271900055}
   - component: {fileID: 3695780548710213026}
   m_Layer: 0
-  m_Name: 2DScifiFighterExcaliburTopViewBlue
+  m_Name: Space Ship Renderer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -599,7 +599,7 @@ SpriteRenderer:
   m_SortingLayerID: -103832621
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300004, guid: c4d8ed7c5adcd0e489c81b34c69fa753, type: 3}
+  m_Sprite: {fileID: 21300004, guid: dfc419ef9ef2f344ab1be015904291d0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

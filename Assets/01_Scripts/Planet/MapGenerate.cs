@@ -112,12 +112,14 @@ public class MapGenerate : MonoBehaviour
                 {
                     if(ObjectPoolManager.Instance.SpawnFromPool("Enemy_Wizard", lastGroundTilePos + Vector3.up * 3f, out var e))
                     {
+                        var wizard = e.GetComponent<Enemy_Wizard>();
+                        wizard.Initialize();
                         clearCanv.PlusEnemyCount(); // enemy += 1
                         float a = Mathf.Max(8, lastGroundTilePos.x);
                         float b = lastGroundTilePos.y;
 
                         var spawnPos = new Vector3(a, b + 3f, 0);
-                        e.GetComponent<Enemy_Wizard>().SetStartPosition(spawnPos);
+                        wizard.SetStartPosition(spawnPos);
                     }
                 }
             }
