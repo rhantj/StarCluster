@@ -80,6 +80,8 @@ public class Enemy_Wizard : EnemyBase
     public void Initialize()
     {
         hp = 3;
+        rb.isKinematic = false;
+        col.isTrigger = false;
         currentState = State.Patrol;
         stateMachine.ChangeState(State.Patrol);
     }
@@ -232,6 +234,7 @@ public class Enemy_Wizard : EnemyBase
 
             anim.SetInteger(owner.GetAnimationHash(AnimationMap.Death), owner.hp);
             rb.isKinematic = true;
+            col.isTrigger = true;
         }
     }
 

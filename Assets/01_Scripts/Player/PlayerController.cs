@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : ReplayRecorder
 {
     PlayerContext plc;
 
@@ -22,7 +22,8 @@ public class PlayerController : MonoBehaviour
     float angle = 0f;
 
     [Header("Interaction")]
-    bool canEntry = false;
+    bool canOpen = false;
+    IInteractable currentInteractable;
 
     [Header("Fire")]
     [SerializeField] GameObject bullet;
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviour
     [Header("Get damage")]
     int getDmg = 0;
 
-    private void Awake()
+    protected override void Awake()
     {
         plc = GetComponent<PlayerContext>();
         //jumpPower *= 1.5f;
@@ -67,26 +68,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var tag = collision.tag;
-        ChangeEntry(tag);
+        if (collision.TryGetComponent<IInteractable>(out var interactable))
+        {
+            currentInteractable = interactable;
+            canOpen = true;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        var tag = collision.tag;
-        ChangeEntry(tag);
-    }
-
-    void ChangeEntry(string tag)
-    {
-        if (tag.Equals("ReturnPoint"))
+        if (currentInteractable != null && collision.gameObject == ((MonoBehaviour)currentInteractable).gameObject)
         {
-            canEntry = !canEntry;
+            currentInteractable = null;
+            canOpen = false;
         }
     }
 
     private void MoveInput(InputAction.CallbackContext obj)
     {
+        StartRecording();
         moveInput = obj.ReadValue<Vector2>();
     }
 
@@ -102,12 +102,10 @@ public class PlayerController : MonoBehaviour
 
     private void Interaction_started(InputAction.CallbackContext obj)
     {
-        if (!canEntry || !obj.started) return;
-
-        var clearCanv = GameObject.FindGameObjectWithTag("Canvas");
-        var panel = clearCanv.GetComponent<ClearControl>();
-
-        panel.Toggle();
+        if(canOpen && obj.started && currentInteractable != null)
+        {
+            currentInteractable.OnInteraction(this);
+        }
     }
 
     private void Fire_started(InputAction.CallbackContext obj)
@@ -129,7 +127,7 @@ public class PlayerController : MonoBehaviour
     {
         getDmg = 0;
         plc.Velocity = Vector2.zero;
-
+        StartRecording();
     }
 
     void CalculateMovement()

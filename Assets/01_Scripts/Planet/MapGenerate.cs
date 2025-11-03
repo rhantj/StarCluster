@@ -6,8 +6,6 @@ using UnityEngine.Tilemaps;
 
 public class MapGenerate : MonoBehaviour
 {
-    PlanetStateMap planetState;
-
     [Header("Tiles")]
     [SerializeField] Tilemap map;
     [SerializeField] TileBase groundTile;
@@ -23,13 +21,18 @@ public class MapGenerate : MonoBehaviour
     [SerializeField] Vector2Int mapSize = new Vector2Int(40, 40);
     [SerializeField] ClearControl clearCanv;
 
-
-    private void Awake()
+    public void Initialize(Tilemap map, TileBase groundTile, TileBase wallTile, TileBase platformTile, Transform returnPoint, Vector2Int mapSize, ClearControl clearCanv)
     {
-        planetState = GameManager.Instance.GetPlanetState();
+        this.map = map;
+        this.groundTile = groundTile;
+        this.wallTile = wallTile;
+        this.platformTile = platformTile;
+        this.returnPoint = returnPoint;
+        this.mapSize = mapSize;
+        this.clearCanv = clearCanv;
     }
 
-    private void OnEnable()
+    private void Start()
     {
         SetGround();
         GenerateMap();
@@ -65,9 +68,9 @@ public class MapGenerate : MonoBehaviour
             if (rand.NextDouble() < randomWalk)
             {
                 var dir = rand.NextDouble();
-                var p = 0.33;
+                float p = 0.33f;
                 if (dir < p) h += rand.Next(0, 3);
-                else if (dir < p * 2) h -= rand.Next(0, 3);
+                else if (dir < p * 2f) h -= rand.Next(0, 3);
             }
             h = Mathf.Max(0, h);
             heights[x] = h;
@@ -81,7 +84,6 @@ public class MapGenerate : MonoBehaviour
             if (makeGap)
             {
                 int gap = rand.Next(2, 6);
-                if (gap < 2) gap = 2;
 
                 i += Mathf.Min(gap, mapWidth - i);
             }
@@ -108,7 +110,7 @@ public class MapGenerate : MonoBehaviour
                 lastGroundTilePos = new Vector3Int(x, y, 0);
 
                 //enemy
-                if (rand.NextDouble() < enemyChance && planetState == PlanetStateMap.Combat)
+                if (rand.NextDouble() < enemyChance)
                 {
                     if(ObjectPoolManager.Instance.SpawnFromPool("Enemy_Wizard", lastGroundTilePos + Vector3.up * 3f, out var e))
                     {
@@ -117,7 +119,7 @@ public class MapGenerate : MonoBehaviour
                         clearCanv.PlusEnemyCount(); // enemy += 1
                         float a = Mathf.Max(8, lastGroundTilePos.x);
                         float b = lastGroundTilePos.y;
-
+                
                         var spawnPos = new Vector3(a, b + 3f, 0);
                         wizard.SetStartPosition(spawnPos);
                     }
