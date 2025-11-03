@@ -84,6 +84,7 @@ public class Enemy_Wizard : EnemyBase
         col.isTrigger = false;
         currentState = State.Patrol;
         stateMachine.ChangeState(State.Patrol);
+        StartCoroutine(SetReference());
     }
 
     public void SetStartPosition(Vector3 pos)

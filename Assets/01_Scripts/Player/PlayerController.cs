@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
-public class PlayerController : ReplayRecorder
+public class PlayerController : ReplayRecorder, IRewindable
 {
     PlayerContext plc;
 
@@ -35,6 +35,7 @@ public class PlayerController : ReplayRecorder
 
     protected override void Awake()
     {
+        base.Awake();
         plc = GetComponent<PlayerContext>();
         //jumpPower *= 1.5f;
 
@@ -51,6 +52,11 @@ public class PlayerController : ReplayRecorder
         plc.InputActions.Enable();
     }
 
+    void OnDisable()
+    {
+        StopPlaybackAndClearFrames(true);
+    }
+
     private void OnDestroy()
     {
         plc.InputActions.Disable();
@@ -63,7 +69,11 @@ public class PlayerController : ReplayRecorder
 
     private void FixedUpdate()
     {
-        CalculateMovement();
+        if (!IsRewinding)
+        {
+            CalculateJump();
+            CalculateMovement();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -86,18 +96,12 @@ public class PlayerController : ReplayRecorder
 
     private void MoveInput(InputAction.CallbackContext obj)
     {
-        StartRecording();
         moveInput = obj.ReadValue<Vector2>();
     }
 
     private void JumpPressed(InputAction.CallbackContext obj)
     {
         jumpPressed = true;
-        if (jumpPressed && IsGrounded())
-        {
-            plc.Rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            jumpPressed = false;
-        }
     }
 
     private void Interaction_started(InputAction.CallbackContext obj)
@@ -135,6 +139,15 @@ public class PlayerController : ReplayRecorder
         plc.Velocity = new Vector2(moveInput.x * moveSpeed, plc.Velocity.y);
     }
 
+    void CalculateJump()
+    {
+        if (jumpPressed && IsGrounded())
+        {
+            plc.Rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            jumpPressed = false;
+        }
+    }
+
     void UpdateFacing()
     {
         if (moveInput.x >= 0.01f) plc.Facing = 1;
@@ -160,5 +173,10 @@ public class PlayerController : ReplayRecorder
         ObjectPoolManager.Instance.SpawnFromPool("PlayerProjectile", firePoint.position, out var p);
 
         p.GetComponent<PlayerProjectile>().Fire(Vector3.up * plc.Facing, 11f, plc.Facing != 1);
+    }
+
+    public void Rewind()
+    {
+        StartReversePlayBack();
     }
 }

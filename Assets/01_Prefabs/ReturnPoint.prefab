@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2954278443769836025}
   - component: {fileID: 4555250657439455134}
   - component: {fileID: 5081558415597748772}
-  - component: {fileID: 2895764126273050461}
   - component: {fileID: 1092685455499199618}
   m_Layer: 0
   m_Name: ReturnPoint
@@ -99,23 +98,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: feeb9c677cb057940824c8dabb16671a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2895764126273050461
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7928918013830619198}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eec5c76edd93af545a8e66064e3cc1fe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scene:
-    m_AssetGUID: ead5f49ab859fe14f8eb60dad62ae6a1
-    m_SubObjectName: 
-    m_SubObjectType: 
-    m_EditorAssetChanged: 0
 --- !u!58 &1092685455499199618
 CircleCollider2D:
   m_ObjectHideFlags: 0

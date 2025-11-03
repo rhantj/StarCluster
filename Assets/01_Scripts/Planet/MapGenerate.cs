@@ -9,7 +9,6 @@ public class MapGenerate : MonoBehaviour
     [Header("Tiles")]
     [SerializeField] Tilemap map;
     [SerializeField] TileBase groundTile;
-    [SerializeField] TileBase wallTile;
     [SerializeField] TileBase platformTile;
 
     [Header("Elements")]
@@ -21,11 +20,10 @@ public class MapGenerate : MonoBehaviour
     [SerializeField] Vector2Int mapSize = new Vector2Int(40, 40);
     [SerializeField] ClearControl clearCanv;
 
-    public void Initialize(Tilemap map, TileBase groundTile, TileBase wallTile, TileBase platformTile, Transform returnPoint, Vector2Int mapSize, ClearControl clearCanv)
+    public void Initialize(Tilemap map, TileBase groundTile, TileBase platformTile, Transform returnPoint, Vector2Int mapSize, ClearControl clearCanv)
     {
         this.map = map;
         this.groundTile = groundTile;
-        this.wallTile = wallTile;
         this.platformTile = platformTile;
         this.returnPoint = returnPoint;
         this.mapSize = mapSize;
@@ -34,20 +32,7 @@ public class MapGenerate : MonoBehaviour
 
     private void Start()
     {
-        SetGround();
         GenerateMap();
-    }
-
-    void SetGround()
-    {
-        for (int i = 0; i < mapSize.x; ++i)
-        {
-            map.SetTile(new Vector3Int(i, 0, 0), groundTile);
-            map.SetTile(new Vector3Int(i, 17, 0), groundTile);
-
-            map.SetTile(new Vector3Int(0, i, 0), wallTile);
-            map.SetTile(new Vector3Int(mapSize.x, i, 0), wallTile);
-        }
     }
 
     void GenerateMap()
@@ -72,7 +57,7 @@ public class MapGenerate : MonoBehaviour
                 if (dir < p) h += rand.Next(0, 3);
                 else if (dir < p * 2f) h -= rand.Next(0, 3);
             }
-            h = Mathf.Max(0, h);
+            h = Mathf.Max(1, h);
             heights[x] = h;
         }
 

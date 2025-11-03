@@ -10,12 +10,11 @@ public class ReplayRecorder : MonoBehaviour
     public event StateChangeHandler OnStateChange;
 
     [Header("Replay Settings")]
-    public int recordFps = 30;
-    public int maxFrames = 2000;
+    public int recordFps = 60;
+    public int maxFrames = 4000;
     public float rewindSpeed = 30f;
 
     protected Rigidbody2D rb;
-    protected SpriteRenderer sprite;
 
     protected Stack<FrameData> recordedFrames = new();
     protected Coroutine recordCo;
@@ -27,7 +26,6 @@ public class ReplayRecorder : MonoBehaviour
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        sprite = GetComponentInChildren<SpriteRenderer>();
     }
 
     public void StartRecording()
@@ -35,6 +33,7 @@ public class ReplayRecorder : MonoBehaviour
         if (IsRecording) return;
         StopPlaybackAndClearFrames(false);
         IsRecording = true;
+        Debug.Log("Start Record");
 
         if (gameObject.activeSelf)
         {
@@ -119,8 +118,6 @@ public class ReplayRecorder : MonoBehaviour
                 velocity = rb.velocity
             };
 
-            if (sprite != null) f.color = sprite.color;
-
             recordedFrames.Push(f);
         }
     }
@@ -153,9 +150,6 @@ public class ReplayRecorder : MonoBehaviour
                     transform.SetPositionAndRotation(new Vector3(pos.x, pos.y, transform.position.z),
                                                      Quaternion.Euler(0, 0, rot));
                     transform.localScale = Vector3.Lerp(first.localScale, second.localScale, elapstedTime);
-
-                    if (sprite != null)
-                        sprite.color = Color.Lerp(first.color, second.color, elapstedTime);
 
                     yield return wait;
                 }

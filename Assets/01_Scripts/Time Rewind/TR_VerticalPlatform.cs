@@ -5,10 +5,24 @@ using UnityEngine;
 public class TR_VerticalPlatform : ReplayRecorder, IRewindable
 {
     float speed = 5f;
+    float moveDis = 5f;
+    Vector3 firstPos;
+    Vector3 upSidePos;
+    Vector3 downSidePos;
 
     private void Start()
     {
+        firstPos = transform.position;
+        upSidePos = firstPos + Vector3.up * moveDis;
+        downSidePos = firstPos + Vector3.down * moveDis;
+
+        RewindableManager.Instance?.Registration(this);
         MoveUpdown();
+    }
+
+    private void OnDisable()
+    {
+        RewindableManager.Instance?.Unregister(this);
     }
 
     public void MoveUpdown()
@@ -18,8 +32,6 @@ public class TR_VerticalPlatform : ReplayRecorder, IRewindable
 
     IEnumerator Co_MoveUpDown()
     {
-        float moveDis = 10f;
-        float total = 0f;
         var wait = new WaitForFixedUpdate();
         
         int side = 1;
@@ -29,14 +41,10 @@ public class TR_VerticalPlatform : ReplayRecorder, IRewindable
         {
             while (IsRewinding) yield return null;
 
-            float dis = rb.velocity.magnitude * Time.fixedDeltaTime;
-            total += dis;
-
-            if (total >= moveDis)
-            {
-                side = -side;
-                total = 0f;
-            }
+            if (transform.position.y >= upSidePos.y)
+                side = -1;
+            else if (transform.position.y <= downSidePos.y)
+                side = 1;
 
             rb.velocity = speed * side * Vector2.up;
             yield return wait;

@@ -7,6 +7,5 @@ public struct FrameData
     public Vector3 position;
     public float rotation; 
     public Vector3 localScale;
-    public Color color;
     public Vector3 velocity;
 }

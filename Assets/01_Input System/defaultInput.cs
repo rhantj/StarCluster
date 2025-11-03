@@ -174,6 +174,34 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Time"",
+            ""id"": ""4c1e0ecc-cc96-44e3-99fc-24bf524bf5d0"",
+            ""actions"": [
+                {
+                    ""name"": ""Rewind"",
+                    ""type"": ""Button"",
+                    ""id"": ""afc1f9ac-6eb8-469b-b421-d5353e3d9db6"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""a308f9bf-f2a8-476b-bbd1-12244d0479b2"",
+                    ""path"": ""<Keyboard>/c"",
+                    ""interactions"": ""Press"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rewind"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -185,6 +213,9 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_Panel = m_Player.FindAction("Panel", throwIfNotFound: true);
+        // Time
+        m_Time = asset.FindActionMap("Time", throwIfNotFound: true);
+        m_Time_Rewind = m_Time.FindAction("Rewind", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -320,6 +351,52 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Time
+    private readonly InputActionMap m_Time;
+    private List<ITimeActions> m_TimeActionsCallbackInterfaces = new List<ITimeActions>();
+    private readonly InputAction m_Time_Rewind;
+    public struct TimeActions
+    {
+        private @DefaultInput m_Wrapper;
+        public TimeActions(@DefaultInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Rewind => m_Wrapper.m_Time_Rewind;
+        public InputActionMap Get() { return m_Wrapper.m_Time; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(TimeActions set) { return set.Get(); }
+        public void AddCallbacks(ITimeActions instance)
+        {
+            if (instance == null || m_Wrapper.m_TimeActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_TimeActionsCallbackInterfaces.Add(instance);
+            @Rewind.started += instance.OnRewind;
+            @Rewind.performed += instance.OnRewind;
+            @Rewind.canceled += instance.OnRewind;
+        }
+
+        private void UnregisterCallbacks(ITimeActions instance)
+        {
+            @Rewind.started -= instance.OnRewind;
+            @Rewind.performed -= instance.OnRewind;
+            @Rewind.canceled -= instance.OnRewind;
+        }
+
+        public void RemoveCallbacks(ITimeActions instance)
+        {
+            if (m_Wrapper.m_TimeActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ITimeActions instance)
+        {
+            foreach (var item in m_Wrapper.m_TimeActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_TimeActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public TimeActions @Time => new TimeActions(this);
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -327,5 +404,9 @@ public partial class @DefaultInput: IInputActionCollection2, IDisposable
         void OnInteraction(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
         void OnPanel(InputAction.CallbackContext context);
+    }
+    public interface ITimeActions
+    {
+        void OnRewind(InputAction.CallbackContext context);
     }
 }

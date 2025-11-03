@@ -3,17 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TR_Fence : ReplayRecorder, IInteractable
+public class TR_Fence : ReplayRecorder, IInteractable, IRewindable
 {
     float speed = 8f;
     Vector3 downSidePos;
     Vector3 upSidePos;
     bool side = false; // f : down, t : up
 
-    private void OnEnable()
+    private void Start()
     {
+        RewindableManager.Instance?.Registration(this);
         downSidePos = transform.position;
         upSidePos = transform.position + Vector3.up * 3f;
+
+        StartRecording();
+    }
+
+    void OnDisable()
+    {
+        RewindableManager.Instance?.Unregister(this);
     }
 
     void GoUpside()
@@ -24,7 +32,6 @@ public class TR_Fence : ReplayRecorder, IInteractable
     IEnumerator Co_GoUpside( )
     {
         var wait = new WaitForFixedUpdate();
-        StartRecording();
 
         float sidefacing = side ? -1f : 1f;
         while (true)
@@ -45,14 +52,18 @@ public class TR_Fence : ReplayRecorder, IInteractable
                 break;
             }
         }
-
-        StopRecording();
-
         rb.velocity = Vector3.zero;
+
+        yield return wait;
     }
 
     public void OnInteraction(PlayerController player)
     {
         GoUpside();
+    }
+
+    public void Rewind()
+    {
+        StartReversePlayBack();
     }
 }

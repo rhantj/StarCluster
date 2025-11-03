@@ -152,6 +152,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Time",
+            "id": "4c1e0ecc-cc96-44e3-99fc-24bf524bf5d0",
+            "actions": [
+                {
+                    "name": "Rewind",
+                    "type": "Button",
+                    "id": "afc1f9ac-6eb8-469b-b421-d5353e3d9db6",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a308f9bf-f2a8-476b-bbd1-12244d0479b2",
+                    "path": "<Keyboard>/c",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Rewind",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": []
