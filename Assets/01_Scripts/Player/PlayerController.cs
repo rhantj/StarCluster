@@ -114,6 +114,7 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     private void Fire_started(InputAction.CallbackContext obj)
     {
+        if (IsRewinding) return;
         isFire = true;
     }
 
@@ -170,6 +171,7 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     public void StartFire()
     {
+
         ObjectPoolManager.Instance.SpawnFromPool("PlayerProjectile", firePoint.position, out var p);
 
         p.GetComponent<PlayerProjectile>().Fire(Vector3.up * plc.Facing, 11f, plc.Facing != 1);
