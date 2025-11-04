@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.XR.Oculus.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,8 +16,6 @@ public class RewindableManager : MonoBehaviour
     {
         var player = GameObject.FindGameObjectWithTag("Player");
         rewindables.Add(player.GetComponent<IRewindable>());
-
-        Invoke(nameof(StartRewind), 5f);
     }
 
     public void Registration(IRewindable rw)
@@ -37,5 +33,11 @@ public class RewindableManager : MonoBehaviour
     {
         foreach (var r in rewindables)
             r.Rewind();
+    }
+
+    public void StopRewind()
+    {
+        foreach (var r in rewindables)
+            r.StopRewind();
     }
 }

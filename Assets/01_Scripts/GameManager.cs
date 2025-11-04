@@ -40,10 +40,18 @@ public class GameManager : MonoBehaviour
         SceneManager.activeSceneChanged += SetPlayer;
     }
 
+    private void Start()
+    {
+        SoundManager.Instance.PlayBGM("Stellar Drift");
+    }
+
     private void SetPlayer(Scene arg0, Scene arg1)
     {
         if(arg1.name.Equals("Space Scene"))
         {
+            SoundManager.Instance.StopBGM();
+            SoundManager.Instance.PlayBGM("Trip");
+
             if(player != null)
             {
                 ObjectPoolManager.Instance.ReturnToPool("Player", player);
@@ -56,7 +64,10 @@ public class GameManager : MonoBehaviour
         }
         else if (arg1.name.Equals("Planet"))
         {
-            if(playerShip != null)
+            SoundManager.Instance.StopBGM();
+            //SoundManager.Instance.PlayBGM("Stellar Drift");
+
+            if (playerShip != null)
             {
                 ObjectPoolManager.Instance.ReturnToPool("Player_SpaceShip", playerShip);
             }

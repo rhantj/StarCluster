@@ -82,6 +82,16 @@ public class PlayerSpaceShipControl : MonoBehaviour
         float x = Mathf.Clamp(context.Velocity.x, -moveSpeed, moveSpeed);
         float y = Mathf.Clamp(context.Velocity.y, -moveSpeed, moveSpeed);
 
+        if (moveInput.x == 0)
+        {
+            x = Mathf.Lerp(x, 0f, moveSpeed * Time.deltaTime);
+        }
+
+        if (moveInput.y == 0)
+        {
+            y = Mathf.Lerp(y, 0f, moveSpeed * Time.deltaTime);
+        }
+
         if (moveInput == Vector2.zero)
         {
             x = Mathf.Lerp(x, 0f, moveSpeed * Time.deltaTime);

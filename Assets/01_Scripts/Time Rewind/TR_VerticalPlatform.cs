@@ -55,4 +55,9 @@ public class TR_VerticalPlatform : ReplayRecorder, IRewindable
     {
         StartReversePlayBack();
     }
+
+    public void StopRewind()
+    {
+        StartRecording();
+    }
 }
