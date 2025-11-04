@@ -66,4 +66,9 @@ public class TR_Fence : ReplayRecorder, IInteractable, IRewindable
     {
         StartReversePlayBack();
     }
+
+    public void StopRewind()
+    {
+        StartRecording();
+    }
 }

@@ -41,10 +41,24 @@ public class PlayerController : ReplayRecorder, IRewindable
 
         plc.InputActions = new DefaultInput();
         plc.InputActions.Player.Move.performed += MoveInput;
-        plc.InputActions.Player.Move.canceled += e => moveInput = Vector2.zero;
+        plc.InputActions.Player.Move.canceled += _ => moveInput = Vector2.zero;
         plc.InputActions.Player.Jump.started += JumpPressed;
         plc.InputActions.Player.Interaction.started += Interaction_started;
         plc.InputActions.Player.Fire.started += Fire_started;
+
+        plc.InputActions.Time.Rewind.started += HandleRewind;
+    }
+
+    private void HandleRewind(InputAction.CallbackContext obj)
+    {
+        if (IsRewinding)
+        {
+            RewindableManager.Instance?.StopRewind();
+        }
+        else
+        {
+            RewindableManager.Instance?.StartRewind();
+        }
     }
 
     private void OnEnable()
@@ -180,5 +194,10 @@ public class PlayerController : ReplayRecorder, IRewindable
     public void Rewind()
     {
         StartReversePlayBack();
+    }
+
+    public void StopRewind()
+    {
+        StartRecording();
     }
 }
