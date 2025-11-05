@@ -107,13 +107,11 @@ public class Enemy_Wizard : EnemyBase
     {
         var pos = transform.position + new Vector3(0.9f * xDir, 0.33f, 0);
         ObjectPoolManager.Instance.SpawnFromPool("EnemyWizardProjectile", pos, out var obj);
+        SoundManager.Instance.PlaySFX("Wizard_Spell", transform.position, 0.5f);
 
         if(obj.TryGetComponent<WizardProjectile>(out var wp))
         {
-            float x = target.position.x - transform.position.x;
-            x = Mathf.Clamp01(x);
-            if (x == 0) x--;
-            wp.Fire(Vector2.right * x, 8f, xDir == -1);
+            wp.Fire(Vector2.right * xDir, 8f, xDir == -1);
         }
     }
 

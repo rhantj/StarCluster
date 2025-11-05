@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,8 +6,8 @@ public class PlayerSpaceShipControl : MonoBehaviour
     PlayerSpaceShipContext context;
 
     [Header("Movement")]
-    float moveSpeed = 5f;
     public Vector2 moveInput;
+    public float moveSpeed { get; set; } = 8f;
 
     [Header("Scene load")]
     bool canEntry = false;
@@ -79,30 +77,19 @@ public class PlayerSpaceShipControl : MonoBehaviour
 
     void CalculateMovement()
     {
-        float x = Mathf.Clamp(context.Velocity.x, -moveSpeed, moveSpeed);
-        float y = Mathf.Clamp(context.Velocity.y, -moveSpeed, moveSpeed);
+        var currentVelocity = context.Velocity;
+        var target = moveInput * moveSpeed;
 
-        if (moveInput.x == 0)
+        var t = 1f - Mathf.Exp(-moveSpeed * Time.deltaTime);
+
+        var nextVelocity = Vector2.Lerp(currentVelocity, target, t);
+
+        if (nextVelocity.sqrMagnitude > moveSpeed * moveSpeed)
         {
-            x = Mathf.Lerp(x, 0f, moveSpeed * Time.deltaTime);
+            nextVelocity = nextVelocity.normalized * moveSpeed;
         }
 
-        if (moveInput.y == 0)
-        {
-            y = Mathf.Lerp(y, 0f, moveSpeed * Time.deltaTime);
-        }
-
-        if (moveInput == Vector2.zero)
-        {
-            x = Mathf.Lerp(x, 0f, moveSpeed * Time.deltaTime);
-            y = Mathf.Lerp(y, 0f, moveSpeed * Time.deltaTime);
-        }
-
-        context.Velocity = new Vector2
-            (
-                moveSpeed * moveInput.x + x, 
-                moveSpeed * moveInput.y + y
-            );
+        context.Velocity = nextVelocity;
     }
 
     void CalculateRotate()

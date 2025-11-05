@@ -5,9 +5,10 @@ using UnityEngine;
 public class WizardProjectile : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
-
+    Rigidbody2D rb;
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -18,14 +19,15 @@ public class WizardProjectile : MonoBehaviour
 
     IEnumerator Co_Fire(Vector2 dir, float speed, bool flip)
     {
+        var wait = new WaitForFixedUpdate();
         spriteRenderer.flipX = flip;
 
         float elapsedTime = 0f;
         while(elapsedTime < 3f)
         {
             elapsedTime += Time.deltaTime;
-            transform.Translate(dir * speed * Time.deltaTime, Space.Self);
-            yield return null;
+            rb.velocity = speed * dir;
+            yield return wait;
         }
 
         ObjectPoolManager.Instance.ReturnToPool("EnemyWizardProjectile", gameObject);
