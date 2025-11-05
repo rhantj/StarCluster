@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -34,6 +31,8 @@ public class SceneManagement : MonoBehaviour
             Debug.LogError("Scene load fail");
             isLoading = false;
         }
+
+        GameManager.Instance.CurrentSceneName = scene.Result.Scene.name;
     }
 
     void OnTriggerEnter2D(Collider2D collision)

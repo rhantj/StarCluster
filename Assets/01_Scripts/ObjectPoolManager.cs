@@ -6,6 +6,7 @@ using UnityEngine.AddressableAssets;
 public class ObjectPoolManager : MonoBehaviour
 {
     public static ObjectPoolManager Instance { get; private set; }
+    public bool IsReady { get; private set; } = false;
 
     [System.Serializable]
     public class Pool
@@ -26,10 +27,7 @@ public class ObjectPoolManager : MonoBehaviour
         {
             Instance = this;
         }
-    }
 
-    private void OnEnable()
-    {
         StartCoroutine(CreatePool());
     }
 
@@ -58,9 +56,25 @@ public class ObjectPoolManager : MonoBehaviour
             poolDataDic.Add(pool.name, pool);
         }
 
+        IsReady = true;
+
         var UI = GetComponent<UIManager>();
 
         UI.SetButtonAction.Invoke();
+    }
+
+    public void GetObjectFromPool(string name, out GameObject obj)
+    {
+        obj = null;
+        if (!poolDictionary.TryGetValue(name, out var q))
+        {
+            return;
+        }
+
+        if (q.Count > 0)
+        {
+            obj = q.Peek();
+        }
     }
 
     public GameObject SpawnFromPool(string name, Vector3 position, out GameObject obj)

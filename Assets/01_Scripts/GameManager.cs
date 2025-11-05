@@ -1,10 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -22,6 +17,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Upgrade Space Ship")]
     UpgradeControl upgradeCtrl;
+
+    public string CurrentSceneName { get; set; }
 
     private void Awake()
     {

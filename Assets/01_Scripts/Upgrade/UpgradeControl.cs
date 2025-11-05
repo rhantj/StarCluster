@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
+
+public class UpgradeJson
+{
+    public int upgrades;
+}
 
 public class UpgradeControl : MonoBehaviour
 {
@@ -13,7 +17,6 @@ public class UpgradeControl : MonoBehaviour
 
     [Header("Selected Item")]
     ItemSlot selectedItem;
-    int selectedItemIdx;
     public TextMeshProUGUI selectedItemName;
     public TextMeshProUGUI selectedItemDescription;
 
@@ -23,14 +26,15 @@ public class UpgradeControl : MonoBehaviour
     public Transform upgradeRequirePos;
     public Button confirmButton;
     public GameObject itemSlot;
-    UpgradeMinerals minerals;
-    UpgradeData upgradeData;
-    int upgrades = 0;
+    public UpgradeData upgradeData;
+    public int upgrades = 0;
 
     private void Awake()
     {
-        minerals = GetComponentInChildren<UpgradeMinerals>();
-        upgradeData = minerals.GetUpgradeData();
+        if (UpgradeSaveLoad.TryLoadJson(out int upgrades))
+        {
+            this.upgrades = upgrades;
+        }
     }
 
     private void OnEnable()
@@ -41,6 +45,8 @@ public class UpgradeControl : MonoBehaviour
 
     private void Start()
     {
+       StartCoroutine(UpgradeShipBeforeStart());
+
         invWindow.SetActive(false);
         slots = new ItemSlot[slotPanel.childCount];
 
@@ -78,7 +84,6 @@ public class UpgradeControl : MonoBehaviour
         if (slots[idx].item == null) return;
 
         selectedItem = slots[idx];
-        selectedItemIdx = idx;
 
         selectedItemName.text = selectedItem.item.Name;
         selectedItemDescription.text = selectedItem.item.Description;
@@ -135,11 +140,6 @@ public class UpgradeControl : MonoBehaviour
 
     public void UpdateUI()
     {
-        StartCoroutine(Co_UpdateUI());
-    }
-
-    IEnumerator Co_UpdateUI()
-    {
         for (int i = 0; i < slots.Length; ++i)
         {
             if (slots[i].item != null)
@@ -150,23 +150,24 @@ public class UpgradeControl : MonoBehaviour
             {
                 slots[i].Clear();
             }
-                yield return null;
         }
     }
 
     void OnConfirmBtnClicked()
     {
-        if (upgrades > spaceShipSprites.Count) return;
         RemoveItem();
     }
 
     void RemoveItem()
     {
+        if (upgrades >= spaceShipSprites.Count) return;
+
         var itemDatas = upgradeData.itemDatas;
         var itemCounts = upgradeData.itemCounts;
 
-        var i = 0;
-        while (i < upgrades)
+        int upgradeCount = Mathf.Min(upgrades + 1, itemDatas.Count);
+
+        for (int i = 0; i < upgradeCount; ++i)
         {
             var slot = GetItemSlot(itemDatas[i]);
             if (slot == null)
@@ -180,57 +181,67 @@ public class UpgradeControl : MonoBehaviour
                 Debug.LogError("Mineral requirements are lacking");
                 return;
             }
-
-            i++;
         }
 
-        int j = 0;
-        while (j < upgrades)
+        for (int i = 0; i < upgradeCount; ++i)
         {
-            var slot = GetItemSlot(itemDatas[j]);
-            slot.count -= itemCounts[j];
-
-            Debug.Log(slot.count);
+            var slot = GetItemSlot(itemDatas[i]);
+            slot.count -= itemCounts[i];
 
             if (slot.count <= 0)
             {
                 slot.item = null;
                 ClearSelectedItemWindow();
             }
-
-            j++;
         }
 
         UpdateUI();
-        UpgradeSpaceShip(upgrades - 1);
+        UpgradeSpaceShip(upgrades);
+        upgrades++;
         NextUpgrade();
+
+        UpgradeSaveLoad.Save(upgrades);
     }
 
     void UpgradeSpaceShip(int idx)
     {
-        var ps = GameManager.Instance.GetSpaceShip();
+        ObjectPoolManager.Instance.GetObjectFromPool("Player_SpaceShip", out var ps);
         ps.GetComponent<PlayerSpaceShipContext>().Renderer.sprite = spaceShipSprites[idx];
 
-        var speed = 8f + (8f / 4f) * (idx + 1);
+        var psSpeed = ps.GetComponent<PlayerSpaceShipControl>().moveSpeed;
+
+        var speed = psSpeed + (psSpeed * 0.25f) * (idx + 1);
         ps.GetComponent<PlayerSpaceShipControl>().SetMoveSpeed(speed);
+    }
+
+    IEnumerator UpgradeShipBeforeStart()
+    {
+        yield return new WaitWhile(() => !ObjectPoolManager.Instance.IsReady);
+
+        int idx = 0;
+        if (upgrades > 0) idx--;
+        else yield break;
+
+        UpgradeSpaceShip(idx);
     }
 
     void NextUpgrade()
     {
-        foreach (Transform items in upgradeRequirePos)
+        for (int i = upgradeRequirePos.childCount - 1; i >= 0; --i)
         {
-            if (items != null)
-                Destroy(items.gameObject);
+            var c = upgradeRequirePos.GetChild(i);
+            if (c != null) Destroy(c.gameObject);
         }
 
-        if (upgrades >= spaceShipSprites.Count - 1) return;
+        if (upgrades >= spaceShipSprites.Count) return;
 
         spaceShipUpgradePanel.sprite = spaceShipSprites[upgrades];
         var itemDatas = upgradeData.itemDatas;
         var itemCounts = upgradeData.itemCounts;
 
-        int i = 0;
-        while (i < upgrades + 1)
+        int upgradeCount = Mathf.Min(upgrades + 1, itemDatas.Count);
+
+        for (int i = 0; i < upgradeCount; ++i) 
         {
             GameObject obj = Instantiate(itemSlot, upgradeRequirePos);
             obj.name = itemDatas[i].name;
@@ -239,10 +250,7 @@ public class UpgradeControl : MonoBehaviour
             slot.icon.sprite = itemDatas[i].Icon;
             slot.countText.text = itemCounts[i].ToString();
 
-            obj.transform.SetParent(upgradeRequirePos, true);
-            i++;
+            obj.transform.SetParent(upgradeRequirePos, false);
         }
-
-        upgrades++;
     }
 }

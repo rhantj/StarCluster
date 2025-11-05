@@ -1,13 +1,14 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerProjectile : MonoBehaviour
 {
     SpriteRenderer spriteRenderer;
+    Rigidbody2D rb;
 
     private void Awake()
     {
+        rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -18,14 +19,15 @@ public class PlayerProjectile : MonoBehaviour
 
     IEnumerator Co_Fire(Vector2 dir, float speed, bool flip)
     {
-        spriteRenderer.flipY = flip;
+        var wait = new WaitForFixedUpdate();
+        spriteRenderer.flipX = flip;
 
         float elapsedTime = 0f;
         while (elapsedTime < 3f)
         {
             elapsedTime += Time.deltaTime;
-            transform.Translate(dir * speed * Time.deltaTime, Space.Self);
-            yield return null;
+            rb.velocity = speed * dir;
+            yield return wait;
         }
 
         ObjectPoolManager.Instance.ReturnToPool(nameof(PlayerProjectile), gameObject);
@@ -45,6 +47,5 @@ public class PlayerProjectile : MonoBehaviour
             e.TakeDamage(2);
             ObjectPoolManager.Instance.ReturnToPool(nameof(PlayerProjectile), gameObject);
         }
-
     }
 }

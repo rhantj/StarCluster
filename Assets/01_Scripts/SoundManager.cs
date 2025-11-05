@@ -81,7 +81,7 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    public void PlaySFX(string clipName, float volume = 0f)
+    public void PlaySFX(string clipName, Vector3 pos, float volume = 0f)
     {
         if (!sfxClips.TryGetValue(clipName, out var clip))
         {
@@ -107,6 +107,7 @@ public class SoundManager : MonoBehaviour
         sfx.clip = clip;
         sfx.volume = volume;
 
+        sfx.transform.position = pos;
         sfx.gameObject.SetActive(true);
         sfx.Play();
 
@@ -116,7 +117,7 @@ public class SoundManager : MonoBehaviour
 
     IEnumerator Co_RTPafterplay(AudioSource src)
     {
-        yield return !src.isPlaying;
+        yield return new WaitWhile(() => src.isPlaying);
 
         src.Stop();
         src.clip = null;
@@ -153,5 +154,19 @@ public class SoundManager : MonoBehaviour
     public void StopBGM()
     {
         bgmSrc.Stop();
+    }
+
+    public void SetBGMVolume(float val)
+    {
+        bgmSrc.volume = val;
+    }
+
+    public void SetSFXVolume(float val)
+    {
+        foreach(var src in activeSfx)
+            src.volume = val;
+
+        foreach(var src in sfxPool)
+            src.volume = val;
     }
 }

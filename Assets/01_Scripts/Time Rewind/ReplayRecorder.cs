@@ -1,13 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class ReplayRecorder : MonoBehaviour
 {
-    public delegate void StateChangeHandler(ReplayRecorder sender);
-    public event StateChangeHandler OnStateChange;
+    //public delegate void StateChangeHandler(ReplayRecorder sender);
+    //public event StateChangeHandler OnStateChange;
 
     [Header("Replay Settings")]
     public int recordFps = 60;
@@ -33,12 +32,11 @@ public class ReplayRecorder : MonoBehaviour
         if (IsRecording) return;
         StopPlaybackAndClearFrames(false);
         IsRecording = true;
-        Debug.Log("Start Record");
 
         if (gameObject.activeSelf)
         {
             recordCo = StartCoroutine(RecordCoroutine());
-            OnStateChange?.Invoke(this);
+           // OnStateChange?.Invoke(this);
         }
     }
 
@@ -51,7 +49,7 @@ public class ReplayRecorder : MonoBehaviour
             StopCoroutine(recordCo);
 
         recordCo = null;
-        OnStateChange?.Invoke(this);
+        //OnStateChange?.Invoke(this);
     }
 
     public void StartReversePlayBack()
@@ -62,7 +60,7 @@ public class ReplayRecorder : MonoBehaviour
 
         rb.velocity = Vector2.zero;
         playbackCo = StartCoroutine(PlaybackCoroutine());
-        OnStateChange?.Invoke(this);
+        //OnStateChange?.Invoke(this);
     }
 
     public void StopPlaybackAndClearFrames(bool clear = true)
@@ -74,7 +72,7 @@ public class ReplayRecorder : MonoBehaviour
         IsRewinding = false;
 
         if (clear) recordedFrames.Clear();
-        OnStateChange?.Invoke(this);
+        //OnStateChange?.Invoke(this);
     }
 
     IEnumerator RecordCoroutine()

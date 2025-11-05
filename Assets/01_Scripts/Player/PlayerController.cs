@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 
 public class PlayerController : ReplayRecorder, IRewindable
 {
@@ -32,6 +29,14 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     [Header("Get damage")]
     int getDmg = 0;
+
+    [SerializeField] private int _stackCount;
+    [SerializeField] private bool _isRecordingView;
+    [SerializeField] private bool _isRewindingView;
+
+    public int STACKCOUNT => _stackCount;
+    public bool ISRECORDING => _isRecordingView;
+    public bool ISREWINDING => _isRewindingView;
 
     protected override void Awake()
     {
@@ -68,6 +73,7 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     void OnDisable()
     {
+        StopRecording();
         StopPlaybackAndClearFrames(true);
     }
 
@@ -78,7 +84,12 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     private void Update()
     {
-        UpdateFacing();
+        if(!IsRewinding)
+            UpdateFacing();
+
+        _stackCount = recordedFrames.Count;
+        _isRecordingView = IsRecording;
+        _isRewindingView = IsRewinding;
     }
 
     private void FixedUpdate()
@@ -170,6 +181,8 @@ public class PlayerController : ReplayRecorder, IRewindable
 
         if (moveInput == Vector2.zero) return;
         plc.Renderer.flipX = plc.Facing != 1;
+
+        firePoint.position = transform.position + Vector3.right * plc.Facing;
     }
 
     public bool IsGrounded()
@@ -185,19 +198,20 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     public void StartFire()
     {
-
         ObjectPoolManager.Instance.SpawnFromPool("PlayerProjectile", firePoint.position, out var p);
-
-        p.GetComponent<PlayerProjectile>().Fire(Vector3.up * plc.Facing, 11f, plc.Facing != 1);
+        SoundManager.Instance.PlaySFX("Player_Fire", transform.position, 0.5f);
+        p.GetComponent<PlayerProjectile>().Fire(Vector3.right * plc.Facing, 11f, plc.Facing != 1);
     }
 
     public void Rewind()
     {
+        plc.Rb.bodyType = RigidbodyType2D.Kinematic; 
         StartReversePlayBack();
     }
 
     public void StopRewind()
     {
+        plc.Rb.bodyType = RigidbodyType2D.Dynamic;
         StartRecording();
     }
 }

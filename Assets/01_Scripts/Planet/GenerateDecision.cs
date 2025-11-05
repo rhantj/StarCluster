@@ -29,6 +29,7 @@ public class GenerateDecision : MonoBehaviour
         {
             case PlanetStateMap.Adventure:
                 adventureTilemap.SetActive(true);
+
                 break;
 
             case PlanetStateMap.Combat:
@@ -37,5 +38,11 @@ public class GenerateDecision : MonoBehaviour
                 generator.Initialize(map, groundTile, platformTile, returnPoint, mapSize, clearCanv);
                 break;
         }
+    }
+
+    private void Start()
+    {
+        SoundManager.Instance.StopBGM();
+        SoundManager.Instance.PlayBGM($"Planet_{planetState}");
     }
 }
