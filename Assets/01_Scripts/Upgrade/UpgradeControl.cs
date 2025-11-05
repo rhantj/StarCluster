@@ -1,13 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-
-public class UpgradeJson
-{
-    public int upgrades;
-}
 
 public class UpgradeControl : MonoBehaviour
 {
@@ -31,9 +27,9 @@ public class UpgradeControl : MonoBehaviour
 
     private void Awake()
     {
-        if (UpgradeSaveLoad.TryLoadJson(out int upgrades))
+        if (UpgradeSaveLoad.TryLoadJson(out var data))
         {
-            this.upgrades = upgrades;
+            upgrades = data.upgrades;
         }
     }
 
@@ -58,6 +54,9 @@ public class UpgradeControl : MonoBehaviour
 
             ClearSelectedItemWindow();
         }
+
+        LoadInventorySlots();
+        UpdateUI();
         NextUpgrade();
     }
 
@@ -98,6 +97,8 @@ public class UpgradeControl : MonoBehaviour
             {
                 slot.count += data.Count;
                 UpdateUI();
+                SaveInventorySlots();
+
                 return;
             }
         }
@@ -110,6 +111,8 @@ public class UpgradeControl : MonoBehaviour
             emptySlot.count = data.Count;
             
             UpdateUI();
+            SaveInventorySlots();
+
             return;
         }
     }
@@ -200,12 +203,12 @@ public class UpgradeControl : MonoBehaviour
         upgrades++;
         NextUpgrade();
 
-        UpgradeSaveLoad.Save(upgrades);
+        SaveInventorySlots();
     }
 
     void UpgradeSpaceShip(int idx)
     {
-        ObjectPoolManager.Instance.GetObjectFromPool("Player_SpaceShip", out var ps);
+        var ps = GameManager.Instance.GetSpaceShip();
         ps.GetComponent<PlayerSpaceShipContext>().Renderer.sprite = spaceShipSprites[idx];
 
         var psSpeed = ps.GetComponent<PlayerSpaceShipControl>().moveSpeed;
@@ -216,13 +219,19 @@ public class UpgradeControl : MonoBehaviour
 
     IEnumerator UpgradeShipBeforeStart()
     {
-        yield return new WaitWhile(() => !ObjectPoolManager.Instance.IsReady);
+        yield return new WaitUntil(() => ObjectPoolManager.Instance.IsReady);
 
-        int idx = 0;
-        if (upgrades > 0) idx--;
+        if (upgrades > 0)
+        {
+            ObjectPoolManager.Instance.GetObjectFromPool("Player_SpaceShip", out var ps);
+            ps.GetComponent<PlayerSpaceShipContext>().Renderer.sprite = spaceShipSprites[upgrades - 1];
+
+            var psSpeed = ps.GetComponent<PlayerSpaceShipControl>().moveSpeed;
+
+            var speed = psSpeed + (psSpeed * 0.25f) * upgrades;
+            ps.GetComponent<PlayerSpaceShipControl>().SetMoveSpeed(speed);
+        }
         else yield break;
-
-        UpgradeSpaceShip(idx);
     }
 
     void NextUpgrade()
@@ -251,6 +260,70 @@ public class UpgradeControl : MonoBehaviour
             slot.countText.text = itemCounts[i].ToString();
 
             obj.transform.SetParent(upgradeRequirePos, false);
+        }
+    }
+
+    void SaveInventorySlots()
+    {
+        var json = new UpgradeJson
+        {
+            upgrades = upgrades,
+            slots = new List<ItemSlotJson>(slots.Length)
+        };
+
+        for (int i = 0; i < slots.Length; ++i)
+        {
+            var slot = slots[i];
+            json.slots.Add(new ItemSlotJson
+            {
+                itemName = slot.item != null ? slot.item.name : string.Empty,
+                count = slot.item != null ? slot.count : 0
+            });
+        }
+
+        UpgradeSaveLoad.Save(json);
+    }
+
+    void LoadInventorySlots()
+    {
+        if (!UpgradeSaveLoad.TryLoadJson(out var data))
+        {
+            SaveInventorySlots();
+            return;
+        }
+
+        upgrades = data.upgrades;
+
+        for (int i = 0; i < data.slots.Count; ++i)
+        {
+            var slot = data.slots[i];
+            if (string.IsNullOrEmpty(slot.itemName) || slot.count <= 0)
+            {
+                slots[i].item = null;
+                slots[i].count = 0;
+                continue;
+            }
+
+            ItemData f = null;
+            foreach (var d in upgradeData.itemDatas)
+            {
+                if (d != null && d.name == slot.itemName)
+                {
+                    f = d;
+                    break;
+                }
+            }
+
+            if (f != null)
+            {
+                slots[i].item = f;
+                slots[i].count = slot.count;
+            }
+            else
+            {
+                slots[i].item = null;
+                slots[i].count = 0;
+            }
         }
     }
 }

@@ -5,13 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class ReplayRecorder : MonoBehaviour
 {
-    //public delegate void StateChangeHandler(ReplayRecorder sender);
-    //public event StateChangeHandler OnStateChange;
-
     [Header("Replay Settings")]
     public int recordFps = 60;
     public int maxFrames = 4000;
-    public float rewindSpeed = 30f;
+    float rewindSpeed = 60f;
 
     protected Rigidbody2D rb;
 
@@ -36,7 +33,6 @@ public class ReplayRecorder : MonoBehaviour
         if (gameObject.activeSelf)
         {
             recordCo = StartCoroutine(RecordCoroutine());
-           // OnStateChange?.Invoke(this);
         }
     }
 
@@ -49,7 +45,6 @@ public class ReplayRecorder : MonoBehaviour
             StopCoroutine(recordCo);
 
         recordCo = null;
-        //OnStateChange?.Invoke(this);
     }
 
     public void StartReversePlayBack()
@@ -60,7 +55,6 @@ public class ReplayRecorder : MonoBehaviour
 
         rb.velocity = Vector2.zero;
         playbackCo = StartCoroutine(PlaybackCoroutine());
-        //OnStateChange?.Invoke(this);
     }
 
     public void StopPlaybackAndClearFrames(bool clear = true)
@@ -72,7 +66,6 @@ public class ReplayRecorder : MonoBehaviour
         IsRewinding = false;
 
         if (clear) recordedFrames.Clear();
-        //OnStateChange?.Invoke(this);
     }
 
     IEnumerator RecordCoroutine()
@@ -120,7 +113,7 @@ public class ReplayRecorder : MonoBehaviour
         }
     }
 
-    IEnumerator PlaybackCoroutine()
+    protected virtual IEnumerator PlaybackCoroutine()
     {
         var wait = new WaitForFixedUpdate();
 
@@ -128,8 +121,8 @@ public class ReplayRecorder : MonoBehaviour
         {
             if (recordedFrames.Count == 0)
             {
-                StopPlaybackAndClearFrames(false);
-                yield break;
+                //StopPlaybackAndClearFrames(false);
+                break;
             }
 
             var first = recordedFrames.Pop();
@@ -152,12 +145,6 @@ public class ReplayRecorder : MonoBehaviour
                     yield return wait;
                 }
             }
-            else
-            {
-                yield return wait;
-            }
         }
-
-        StartRecording();
     }
 }

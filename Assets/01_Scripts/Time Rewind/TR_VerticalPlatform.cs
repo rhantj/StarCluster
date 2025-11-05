@@ -60,4 +60,10 @@ public class TR_VerticalPlatform : ReplayRecorder, IRewindable
     {
         StartRecording();
     }
+
+    protected override IEnumerator PlaybackCoroutine()
+    {
+        yield return base.PlaybackCoroutine();
+        StartRecording();
+    }
 }
