@@ -1,13 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+[Serializable]
 public class UpgradeJson
 {
     public int upgrades;
-    public List<ItemSlotJson> slots = new();
+    public List<ItemSlotJson> jsonSlots;
 }
 
+[Serializable]
 public class ItemSlotJson
 {
     public string itemName;

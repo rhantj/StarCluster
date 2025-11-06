@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,15 +32,9 @@ public class UpgradeControl : MonoBehaviour
         }
     }
 
-    private void OnEnable()
-    {
-        confirmButton.onClick.RemoveAllListeners();
-        confirmButton.onClick.AddListener(OnConfirmBtnClicked);
-    }
-
     private void Start()
     {
-       StartCoroutine(UpgradeShipBeforeStart());
+        StartCoroutine(UpgradeShipBeforeStart());
 
         invWindow.SetActive(false);
         slots = new ItemSlot[slotPanel.childCount];
@@ -58,6 +51,8 @@ public class UpgradeControl : MonoBehaviour
         LoadInventorySlots();
         UpdateUI();
         NextUpgrade();
+
+        confirmButton.onClick.AddListener(OnConfirmBtnClicked);
     }
 
     void ClearSelectedItemWindow()
@@ -88,8 +83,19 @@ public class UpgradeControl : MonoBehaviour
         selectedItemDescription.text = selectedItem.item.Description;
     }
 
+    ItemData MakeReferenceEqual(ItemData data)
+    {
+        if (data == null) return null;
+        foreach(var d in upgradeData.itemDatas)
+        {
+            if (d != null && d.name == data.name) return d;
+        }
+        return data;
+    }
+
     public void AddItem(ItemData data)
     {
+        data = MakeReferenceEqual(data);
         if (data.canStack)
         {
             ItemSlot slot = GetItemSlot(data);
@@ -97,8 +103,6 @@ public class UpgradeControl : MonoBehaviour
             {
                 slot.count += data.Count;
                 UpdateUI();
-                SaveInventorySlots();
-
                 return;
             }
         }
@@ -111,20 +115,20 @@ public class UpgradeControl : MonoBehaviour
             emptySlot.count = data.Count;
             
             UpdateUI();
-            SaveInventorySlots();
-
             return;
         }
     }
 
     ItemSlot GetItemSlot(ItemData data)
     {
+        if (data == null) return null;
+
         for (int i = 0; i < slots.Length; ++i)
         {
-            if (slots[i].item == data)
-            {
-                return slots[i];
-            }
+            var item = slots[i].item;
+            if (item == null) continue;
+
+            if (ReferenceEquals(item, data)) return slots[i];
         }
 
         return null;
@@ -154,6 +158,8 @@ public class UpgradeControl : MonoBehaviour
                 slots[i].Clear();
             }
         }
+
+        SaveInventorySlots();
     }
 
     void OnConfirmBtnClicked()
@@ -268,17 +274,20 @@ public class UpgradeControl : MonoBehaviour
         var json = new UpgradeJson
         {
             upgrades = upgrades,
-            slots = new List<ItemSlotJson>(slots.Length)
+            jsonSlots = new List<ItemSlotJson>(slots.Length),
         };
 
         for (int i = 0; i < slots.Length; ++i)
         {
             var slot = slots[i];
-            json.slots.Add(new ItemSlotJson
+            var jsonSlot = new ItemSlotJson
             {
+
                 itemName = slot.item != null ? slot.item.name : string.Empty,
                 count = slot.item != null ? slot.count : 0
-            });
+            };
+
+            json.jsonSlots.Add(jsonSlot);
         }
 
         UpgradeSaveLoad.Save(json);
@@ -288,42 +297,46 @@ public class UpgradeControl : MonoBehaviour
     {
         if (!UpgradeSaveLoad.TryLoadJson(out var data))
         {
-            SaveInventorySlots();
+            upgrades = 0;
+            foreach(var slot in slots)
+            {
+                slot.item = null;
+                slot.count = 0;     
+            }
             return;
         }
 
         upgrades = data.upgrades;
 
-        for (int i = 0; i < data.slots.Count; ++i)
+        int cnt = data.jsonSlots.Count;
+        for (int i = 0; i < data.jsonSlots.Count; ++i)
         {
-            var slot = data.slots[i];
-            if (string.IsNullOrEmpty(slot.itemName) || slot.count <= 0)
+            var jsonslot = data.jsonSlots[i];
+            if (string.IsNullOrEmpty(jsonslot.itemName) || jsonslot.count <= 0)
             {
                 slots[i].item = null;
                 slots[i].count = 0;
                 continue;
             }
 
-            ItemData f = null;
-            foreach (var d in upgradeData.itemDatas)
+            ItemData idata = null;
+            foreach(var d in upgradeData.itemDatas)
             {
-                if (d != null && d.name == slot.itemName)
+                if (d != null && d.name.Equals(jsonslot.itemName))
                 {
-                    f = d;
+                    idata = d;
                     break;
                 }
             }
 
-            if (f != null)
-            {
-                slots[i].item = f;
-                slots[i].count = slot.count;
-            }
-            else
-            {
-                slots[i].item = null;
-                slots[i].count = 0;
-            }
+            slots[i].item = idata;
+            slots[i].count = jsonslot.count;
+        }
+
+        for (int i = cnt; i < data.jsonSlots.Count; ++i)
+        {
+            slots[i].item = null;
+            slots[i].count = 0;
         }
     }
 }
