@@ -106,7 +106,6 @@ public class ReplayRecorder : MonoBehaviour
                 position = transform.position,
                 rotation = transform.eulerAngles.z,
                 localScale = transform.localScale,
-                velocity = rb.velocity
             };
 
             recordedFrames.Push(f);
@@ -121,7 +120,6 @@ public class ReplayRecorder : MonoBehaviour
         {
             if (recordedFrames.Count == 0)
             {
-                //StopPlaybackAndClearFrames(false);
                 break;
             }
 
