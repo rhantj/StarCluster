@@ -71,4 +71,9 @@ public class TR_Fence : ReplayRecorder, IInteractable, IRewindable
     {
         StartRecording();
     }
+    protected override IEnumerator PlaybackCoroutine()
+    {
+        yield return base.PlaybackCoroutine();
+        StartRecording();
+    }
 }

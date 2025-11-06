@@ -4,11 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UpgradeJson
-{
-    public int upgrades;
-}
-
 public class UpgradeControl : MonoBehaviour
 {
     public ItemSlot[] slots;
@@ -31,21 +26,15 @@ public class UpgradeControl : MonoBehaviour
 
     private void Awake()
     {
-        if (UpgradeSaveLoad.TryLoadJson(out int upgrades))
+        if (UpgradeSaveLoad.TryLoadJson(out var data))
         {
-            this.upgrades = upgrades;
+            upgrades = data.upgrades;
         }
-    }
-
-    private void OnEnable()
-    {
-        confirmButton.onClick.RemoveAllListeners();
-        confirmButton.onClick.AddListener(OnConfirmBtnClicked);
     }
 
     private void Start()
     {
-       StartCoroutine(UpgradeShipBeforeStart());
+        StartCoroutine(UpgradeShipBeforeStart());
 
         invWindow.SetActive(false);
         slots = new ItemSlot[slotPanel.childCount];
@@ -58,7 +47,12 @@ public class UpgradeControl : MonoBehaviour
 
             ClearSelectedItemWindow();
         }
+
+        LoadInventorySlots();
+        UpdateUI();
         NextUpgrade();
+
+        confirmButton.onClick.AddListener(OnConfirmBtnClicked);
     }
 
     void ClearSelectedItemWindow()
@@ -89,8 +83,19 @@ public class UpgradeControl : MonoBehaviour
         selectedItemDescription.text = selectedItem.item.Description;
     }
 
+    ItemData MakeReferenceEqual(ItemData data)
+    {
+        if (data == null) return null;
+        foreach(var d in upgradeData.itemDatas)
+        {
+            if (d != null && d.name == data.name) return d;
+        }
+        return data;
+    }
+
     public void AddItem(ItemData data)
     {
+        data = MakeReferenceEqual(data);
         if (data.canStack)
         {
             ItemSlot slot = GetItemSlot(data);
@@ -116,12 +121,14 @@ public class UpgradeControl : MonoBehaviour
 
     ItemSlot GetItemSlot(ItemData data)
     {
+        if (data == null) return null;
+
         for (int i = 0; i < slots.Length; ++i)
         {
-            if (slots[i].item == data)
-            {
-                return slots[i];
-            }
+            var item = slots[i].item;
+            if (item == null) continue;
+
+            if (ReferenceEquals(item, data)) return slots[i];
         }
 
         return null;
@@ -151,6 +158,8 @@ public class UpgradeControl : MonoBehaviour
                 slots[i].Clear();
             }
         }
+
+        SaveInventorySlots();
     }
 
     void OnConfirmBtnClicked()
@@ -200,12 +209,12 @@ public class UpgradeControl : MonoBehaviour
         upgrades++;
         NextUpgrade();
 
-        UpgradeSaveLoad.Save(upgrades);
+        SaveInventorySlots();
     }
 
     void UpgradeSpaceShip(int idx)
     {
-        ObjectPoolManager.Instance.GetObjectFromPool("Player_SpaceShip", out var ps);
+        var ps = GameManager.Instance.GetSpaceShip();
         ps.GetComponent<PlayerSpaceShipContext>().Renderer.sprite = spaceShipSprites[idx];
 
         var psSpeed = ps.GetComponent<PlayerSpaceShipControl>().moveSpeed;
@@ -216,13 +225,19 @@ public class UpgradeControl : MonoBehaviour
 
     IEnumerator UpgradeShipBeforeStart()
     {
-        yield return new WaitWhile(() => !ObjectPoolManager.Instance.IsReady);
+        yield return new WaitUntil(() => ObjectPoolManager.Instance.IsReady);
 
-        int idx = 0;
-        if (upgrades > 0) idx--;
+        if (upgrades > 0)
+        {
+            ObjectPoolManager.Instance.GetObjectFromPool("Player_SpaceShip", out var ps);
+            ps.GetComponent<PlayerSpaceShipContext>().Renderer.sprite = spaceShipSprites[upgrades - 1];
+
+            var psSpeed = ps.GetComponent<PlayerSpaceShipControl>().moveSpeed;
+
+            var speed = psSpeed + (psSpeed * 0.25f) * upgrades;
+            ps.GetComponent<PlayerSpaceShipControl>().SetMoveSpeed(speed);
+        }
         else yield break;
-
-        UpgradeSpaceShip(idx);
     }
 
     void NextUpgrade()
@@ -251,6 +266,77 @@ public class UpgradeControl : MonoBehaviour
             slot.countText.text = itemCounts[i].ToString();
 
             obj.transform.SetParent(upgradeRequirePos, false);
+        }
+    }
+
+    void SaveInventorySlots()
+    {
+        var json = new UpgradeJson
+        {
+            upgrades = upgrades,
+            jsonSlots = new List<ItemSlotJson>(slots.Length),
+        };
+
+        for (int i = 0; i < slots.Length; ++i)
+        {
+            var slot = slots[i];
+            var jsonSlot = new ItemSlotJson
+            {
+
+                itemName = slot.item != null ? slot.item.name : string.Empty,
+                count = slot.item != null ? slot.count : 0
+            };
+
+            json.jsonSlots.Add(jsonSlot);
+        }
+
+        UpgradeSaveLoad.Save(json);
+    }
+
+    void LoadInventorySlots()
+    {
+        if (!UpgradeSaveLoad.TryLoadJson(out var data))
+        {
+            upgrades = 0;
+            foreach(var slot in slots)
+            {
+                slot.item = null;
+                slot.count = 0;     
+            }
+            return;
+        }
+
+        upgrades = data.upgrades;
+
+        int cnt = data.jsonSlots.Count;
+        for (int i = 0; i < data.jsonSlots.Count; ++i)
+        {
+            var jsonslot = data.jsonSlots[i];
+            if (string.IsNullOrEmpty(jsonslot.itemName) || jsonslot.count <= 0)
+            {
+                slots[i].item = null;
+                slots[i].count = 0;
+                continue;
+            }
+
+            ItemData idata = null;
+            foreach(var d in upgradeData.itemDatas)
+            {
+                if (d != null && d.name.Equals(jsonslot.itemName))
+                {
+                    idata = d;
+                    break;
+                }
+            }
+
+            slots[i].item = idata;
+            slots[i].count = jsonslot.count;
+        }
+
+        for (int i = cnt; i < data.jsonSlots.Count; ++i)
+        {
+            slots[i].item = null;
+            slots[i].count = 0;
         }
     }
 }

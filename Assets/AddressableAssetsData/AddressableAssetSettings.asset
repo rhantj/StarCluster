@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 50c3d003c32865f4e9904c7a50785398
   m_currentHash:
     serializedVersion: 2
-    Hash: 9d1fabd6da4949ee73c343763299df72
+    Hash: 5a800fe4373fdf7be394c5e10e5a8693
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_BundleLocalCatalog: 0
@@ -46,6 +46,7 @@ MonoBehaviour:
   m_GroupAssets:
   - {fileID: 11400000, guid: a5981da2e6f2bcf44b1f1dfa3e4d3c04, type: 2}
   - {fileID: 11400000, guid: 5a70d4e7a9477b44683b5468910b7f5c, type: 2}
+  - {fileID: 11400000, guid: 87c15971fd5c61046ba0bbd613c5b121, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1
@@ -88,6 +89,8 @@ MonoBehaviour:
     m_LabelNames:
     - default
     - Planet
+    - Scene
+    - Prefab
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: af7a59705c5245e47accf4b04d377a09, type: 2}

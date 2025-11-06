@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -211,6 +212,13 @@ public class PlayerController : ReplayRecorder, IRewindable
 
     public void StopRewind()
     {
+        plc.Rb.bodyType = RigidbodyType2D.Dynamic;
+        StartRecording();
+    }
+
+    protected override IEnumerator PlaybackCoroutine()
+    {
+        yield return base.PlaybackCoroutine();
         plc.Rb.bodyType = RigidbodyType2D.Dynamic;
         StartRecording();
     }

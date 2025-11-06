@@ -27,7 +27,6 @@ public class ItemSlot : MonoBehaviour
     {
         if(icon == null)
         {
-            Debug.LogError("Icon is null");
             return;
         }
 
